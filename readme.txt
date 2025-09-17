@@ -61,3 +61,9 @@ Yes. You can go to **Settings → PKL REST API Auth** and uncheck the option to 
 
 = 1.0.0 =
 Initial release of PKL REST API Auth plugin.
+
+= 1.1.0 =
+* Add Email for API testing credential
+  * Method 1: Form-data (Recommended for Postman)
+  * Method 2: Header
+  * Method 3: Query Parameter
