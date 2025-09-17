@@ -3,7 +3,7 @@
  * Plugin Name: PKL REST API Auth
  * Plugin URI: https://github.com/PalmiizKittinan/pkl-wp-rest-api-auth
  * Description: Control WordPress REST API access by requiring user authentication. Disable API access for non-logged-in users with customizable settings.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Kittinan Lamkaek
  * Author URI: https://github.com/PalmiizKittinan
  * License: GPL v2 or later
@@ -64,6 +64,68 @@ class PKL_REST_API_Auth {
     }
     
     /**
+     * Check if email authentication is provided
+     *
+     * @return bool|WP_User
+     */
+    private function check_email_auth() {
+        // Check for email in POST data (form-data)
+        $email = '';
+        
+        // Check in $_POST
+        if (isset($_POST['email']) && !empty($_POST['email'])) {
+            $email = sanitize_email($_POST['email']);
+        }
+        
+        // Check in raw input for form-data
+        if (empty($email)) {
+            $input = file_get_contents('php://input');
+            if (strpos($_SERVER['CONTENT_TYPE'] ?? '', 'multipart/form-data') !== false) {
+                // Parse multipart form data manually
+                $boundary = substr($input, 0, strpos($input, "\r\n"));
+                $parts = array_slice(explode($boundary, $input), 1);
+                
+                foreach ($parts as $part) {
+                    if (strpos($part, 'name="email"') !== false) {
+                        $lines = explode("\r\n", $part);
+                        foreach ($lines as $line) {
+                            if (!empty(trim($line)) && strpos($line, 'name=') === false && strpos($line, 'Content-Disposition') === false) {
+                                $email = sanitize_email(trim($line));
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Check in headers
+        if (empty($email)) {
+            $headers = getallheaders();
+            if (isset($headers['X-Email'])) {
+                $email = sanitize_email($headers['X-Email']);
+            } elseif (isset($headers['x-email'])) {
+                $email = sanitize_email($headers['x-email']);
+            }
+        }
+        
+        // Check in query parameters
+        if (empty($email) && isset($_GET['email'])) {
+            $email = sanitize_email($_GET['email']);
+        }
+        
+        if (!empty($email) && is_email($email)) {
+            $user = get_user_by('email', $email);
+            if ($user && !is_wp_error($user)) {
+                return $user;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
      * Restrict REST API access
      *
      * @param WP_Error|null|bool $result
@@ -75,25 +137,43 @@ class PKL_REST_API_Auth {
             return $result;
         }
         
-        // Check if user is logged in
-        if (!is_user_logged_in()) {
-            return new WP_Error(
-                'rest_not_logged_in',
-                __('You are not currently logged in.', 'pkl-rest-api-auth'),
-                array('status' => 401)
-            );
+        // Check if user is logged in (traditional authentication)
+        if (is_user_logged_in()) {
+            // Check if user has read capability
+            if (!current_user_can('read')) {
+                return new WP_Error(
+                    'rest_insufficient_permissions',
+                    __('You do not have sufficient permissions to access this API.', 'pkl-rest-api-auth'),
+                    array('status' => 403)
+                );
+            }
+            return $result;
         }
         
-        // Check if user has read capability
-        if (!current_user_can('read')) {
-            return new WP_Error(
-                'rest_insufficient_permissions',
-                __('You do not have sufficient permissions to access this API.', 'pkl-rest-api-auth'),
-                array('status' => 403)
-            );
+        // Check for email authentication
+        $user = $this->check_email_auth();
+        if ($user) {
+            // Set the current user for this request
+            wp_set_current_user($user->ID);
+            
+            // Check if user has read capability
+            if (!current_user_can('read')) {
+                return new WP_Error(
+                    'rest_insufficient_permissions',
+                    __('You do not have sufficient permissions to access this API.', 'pkl-rest-api-auth'),
+                    array('status' => 403)
+                );
+            }
+            
+            return $result;
         }
         
-        return $result;
+        // No authentication found
+        return new WP_Error(
+            'rest_not_logged_in',
+            __('You are not currently logged in. Please provide a valid email address.', 'pkl-rest-api-auth'),
+            array('status' => 401)
+        );
     }
     
     /**
@@ -153,6 +233,15 @@ class PKL_REST_API_Auth {
      */
     public function settings_section_callback() {
         echo '<p>' . esc_html__('Configure REST API authentication settings.', 'pkl-rest-api-auth') . '</p>';
+        echo '<div class="notice notice-info inline">';
+        echo '<p><strong>' . esc_html__('Authentication Methods:', 'pkl-rest-api-auth') . '</strong></p>';
+        echo '<ul style="list-style-type: disc; margin-left: 20px;">';
+        echo '<li>' . esc_html__('Traditional WordPress login (cookies)', 'pkl-rest-api-auth') . '</li>';
+        echo '<li>' . esc_html__('Email authentication via form-data (key: email)', 'pkl-rest-api-auth') . '</li>';
+        echo '<li>' . esc_html__('Email authentication via header (X-Email)', 'pkl-rest-api-auth') . '</li>';
+        echo '<li>' . esc_html__('Email authentication via query parameter (?email=)', 'pkl-rest-api-auth') . '</li>';
+        echo '</ul>';
+        echo '</div>';
     }
     
     /**
@@ -162,7 +251,7 @@ class PKL_REST_API_Auth {
         $enable = get_option('pkl_rest_api_auth_enable', 1);
         echo '<input type="checkbox" id="pkl_rest_api_auth_enable" name="pkl_rest_api_auth_enable" value="1" ' . checked(1, $enable, false) . ' />';
         echo '<label for="pkl_rest_api_auth_enable">' . esc_html__('Require authentication for REST API access', 'pkl-rest-api-auth') . '</label>';
-        echo '<p class="description">' . esc_html__('When enabled, only logged-in users can access the WordPress REST API.', 'pkl-rest-api-auth') . '</p>';
+        echo '<p class="description">' . esc_html__('When enabled, only logged-in users or users with valid email authentication can access the WordPress REST API.', 'pkl-rest-api-auth') . '</p>';
     }
     
     /**
@@ -172,6 +261,22 @@ class PKL_REST_API_Auth {
         ?>
         <div class="wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+            
+            <div class="notice notice-warning">
+                <h3><?php esc_html_e('Usage Instructions for Postman/API Testing:', 'pkl-rest-api-auth'); ?></h3>
+                <h4><?php esc_html_e('Method 1: Form-data (Recommended for Postman)', 'pkl-rest-api-auth'); ?></h4>
+                <p><?php esc_html_e('Add to Body > form-data:', 'pkl-rest-api-auth'); ?></p>
+                <code>Key: email | Value: user@example.com</code>
+                
+                <h4><?php esc_html_e('Method 2: Header', 'pkl-rest-api-auth'); ?></h4>
+                <p><?php esc_html_e('Add to Headers:', 'pkl-rest-api-auth'); ?></p>
+                <code>X-Email: user@example.com</code>
+                
+                <h4><?php esc_html_e('Method 3: Query Parameter', 'pkl-rest-api-auth'); ?></h4>
+                <p><?php esc_html_e('Add to URL:', 'pkl-rest-api-auth'); ?></p>
+                <code>?email=user@example.com</code>
+            </div>
+            
             <form action="options.php" method="post">
                 <?php
                 settings_fields('pkl_rest_api_auth');
@@ -201,3 +306,4 @@ class PKL_REST_API_Auth {
 
 // Initialize the plugin
 new PKL_REST_API_Auth();
+
