@@ -73,12 +73,6 @@ Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard
 
 ---
 
-## 🖼️ Screenshots
-
-*(Optional: Add screenshots here if you want, e.g., admin settings page preview.)*
-
----
-
 ## 🛠️ Development
 
 - Clone the repo:
