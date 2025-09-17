@@ -1,7 +1,7 @@
-=== PKL WP REST API Auth ===
+=== PKL REST API Auth ===
 Contributors: palmiizkittinan
 Donate link: https://github.com/PalmiizKittinan
-Tags: rest api, authentication, security, privacy, restrict, block
+Tags: rest api, authentication, security, privacy, restrict
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 7.4
@@ -13,7 +13,7 @@ Control WordPress REST API access by requiring user authentication. Disable API 
 
 == Description ==
 
-PKL WP REST API Auth is a lightweight plugin that helps secure your WordPress site by restricting access to the REST API.
+PKL REST API Auth is a lightweight plugin that helps secure your WordPress site by restricting access to the REST API.
 
 - 🔒 Restrict REST API access to logged-in users only.
 - 🚫 Block unauthenticated requests with customizable settings.
@@ -25,7 +25,7 @@ This plugin is ideal if you want to improve privacy and security by preventing u
 
 == Installation ==
 
-1. Upload the plugin files to the `/wp-content/plugins/pkl-wp-rest-api-auth` directory, or install the plugin through the WordPress plugins screen directly.
+1. Upload the plugin files to the `/wp-content/plugins/pkl-rest-api-auth` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the **Plugins** screen in WordPress.
 3. Navigate to **Settings → PKL REST API Auth** to configure the plugin.
 
@@ -60,4 +60,4 @@ Yes. You can go to **Settings → PKL REST API Auth** and uncheck the option to 
 == Upgrade Notice ==
 
 = 1.0.0 =
-Initial release of PKL WP REST API Auth plugin.
+Initial release of PKL REST API Auth plugin.
