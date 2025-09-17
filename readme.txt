@@ -3,9 +3,9 @@ Contributors: palmiizkittinan
 Donate link: https://github.com/PalmiizKittinan
 Tags: rest api, authentication, security, privacy, restrict, block
 Requires at least: 5.0
-Tested up to: 6.4
+Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.2
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,3 +58,6 @@ Yes. You can go to **Settings → PKL REST API Auth** and uncheck the option to 
 * First public release. Adds REST API authentication requirement with settings page.
 
 == Upgrade Notice ==
+
+= 1.0.0 =
+Initial release of PKL WP REST API Auth plugin.
