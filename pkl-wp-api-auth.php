@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: PKL WP REST API Auth
+ * Plugin Name: PKL REST API Auth
  * Plugin URI: https://github.com/PalmiizKittinan/pkl-wp-rest-api-auth
  * Description: Control WordPress REST API access by requiring user authentication. Disable API access for non-logged-in users with customizable settings.
  * Version: 1.0.0
@@ -8,7 +8,7 @@
  * Author URI: https://github.com/PalmiizKittinan
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: pkl-wp-rest-api-auth
+ * Text Domain: pkl-rest-api-auth
  * Requires at least: 5.0
  * Tested up to: 6.8
  * Requires PHP: 7.4
@@ -20,14 +20,14 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('PKL_WP_REST_API_AUTH_VERSION', '1.0.0');
-define('PKL_WP_REST_API_AUTH_PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('PKL_WP_REST_API_AUTH_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('PKL_REST_API_AUTH_VERSION', '1.0.0');
+define('PKL_REST_API_AUTH_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('PKL_REST_API_AUTH_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 /**
  * Main plugin class
  */
-class PKL_WP_REST_API_Auth {
+class PKL_REST_API_Auth {
     
     /**
      * Constructor
@@ -56,7 +56,7 @@ class PKL_WP_REST_API_Auth {
      * Setup REST API authentication
      */
     private function setup_rest_auth() {
-        $enable_auth = get_option('pkl_wp_rest_api_auth_enable', 1);
+        $enable_auth = get_option('pkl_rest_api_auth_enable', 1);
         
         if ($enable_auth) {
             add_filter('rest_authentication_errors', array($this, 'restrict_rest_api'));
@@ -79,7 +79,7 @@ class PKL_WP_REST_API_Auth {
         if (!is_user_logged_in()) {
             return new WP_Error(
                 'rest_not_logged_in',
-                __('You are not currently logged in.', 'pkl-wp-rest-api-auth'),
+                __('You are not currently logged in.', 'pkl-rest-api-auth'),
                 array('status' => 401)
             );
         }
@@ -88,7 +88,7 @@ class PKL_WP_REST_API_Auth {
         if (!current_user_can('read')) {
             return new WP_Error(
                 'rest_insufficient_permissions',
-                __('You do not have sufficient permissions to access this API.', 'pkl-wp-rest-api-auth'),
+                __('You do not have sufficient permissions to access this API.', 'pkl-rest-api-auth'),
                 array('status' => 403)
             );
         }
@@ -101,10 +101,10 @@ class PKL_WP_REST_API_Auth {
      */
     public function add_admin_menu() {
         add_options_page(
-            __('PKL REST API Auth Settings', 'pkl-wp-rest-api-auth'),
-            __('PKL REST API Auth', 'pkl-wp-rest-api-auth'),
+            __('PKL REST API Auth Settings', 'pkl-rest-api-auth'),
+            __('PKL REST API Auth', 'pkl-rest-api-auth'),
             'manage_options',
-            'pkl-wp-rest-api-auth',
+            'pkl-rest-api-auth',
             array($this, 'settings_page')
         );
     }
@@ -124,8 +124,8 @@ class PKL_WP_REST_API_Auth {
      */
     public function settings_init() {
         register_setting(
-            'pkl_wp_rest_api_auth', 
-            'pkl_wp_rest_api_auth_enable',
+            'pkl_rest_api_auth', 
+            'pkl_rest_api_auth_enable',
             array(
                 'sanitize_callback' => array($this, 'sanitize_checkbox'),
                 'default' => 1
@@ -133,18 +133,18 @@ class PKL_WP_REST_API_Auth {
         );
         
         add_settings_section(
-            'pkl_wp_rest_api_auth_section',
-            __('REST API Authentication Settings', 'pkl-wp-rest-api-auth'),
+            'pkl_rest_api_auth_section',
+            __('REST API Authentication Settings', 'pkl-rest-api-auth'),
             array($this, 'settings_section_callback'),
-            'pkl_wp_rest_api_auth'
+            'pkl_rest_api_auth'
         );
         
         add_settings_field(
-            'pkl_wp_rest_api_auth_enable',
-            __('Enable REST API Authentication', 'pkl-wp-rest-api-auth'),
+            'pkl_rest_api_auth_enable',
+            __('Enable REST API Authentication', 'pkl-rest-api-auth'),
             array($this, 'enable_field_callback'),
-            'pkl_wp_rest_api_auth',
-            'pkl_wp_rest_api_auth_section'
+            'pkl_rest_api_auth',
+            'pkl_rest_api_auth_section'
         );
     }
     
@@ -152,17 +152,17 @@ class PKL_WP_REST_API_Auth {
      * Settings section callback
      */
     public function settings_section_callback() {
-        echo '<p>' . esc_html__('Configure REST API authentication settings.', 'pkl-wp-rest-api-auth') . '</p>';
+        echo '<p>' . esc_html__('Configure REST API authentication settings.', 'pkl-rest-api-auth') . '</p>';
     }
     
     /**
      * Enable field callback
      */
     public function enable_field_callback() {
-        $enable = get_option('pkl_wp_rest_api_auth_enable', 1);
-        echo '<input type="checkbox" id="pkl_wp_rest_api_auth_enable" name="pkl_wp_rest_api_auth_enable" value="1" ' . checked(1, $enable, false) . ' />';
-        echo '<label for="pkl_wp_rest_api_auth_enable">' . esc_html__('Require authentication for REST API access', 'pkl-wp-rest-api-auth') . '</label>';
-        echo '<p class="description">' . esc_html__('When enabled, only logged-in users can access the WordPress REST API.', 'pkl-wp-rest-api-auth') . '</p>';
+        $enable = get_option('pkl_rest_api_auth_enable', 1);
+        echo '<input type="checkbox" id="pkl_rest_api_auth_enable" name="pkl_rest_api_auth_enable" value="1" ' . checked(1, $enable, false) . ' />';
+        echo '<label for="pkl_rest_api_auth_enable">' . esc_html__('Require authentication for REST API access', 'pkl-rest-api-auth') . '</label>';
+        echo '<p class="description">' . esc_html__('When enabled, only logged-in users can access the WordPress REST API.', 'pkl-rest-api-auth') . '</p>';
     }
     
     /**
@@ -174,8 +174,8 @@ class PKL_WP_REST_API_Auth {
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
             <form action="options.php" method="post">
                 <?php
-                settings_fields('pkl_wp_rest_api_auth');
-                do_settings_sections('pkl_wp_rest_api_auth');
+                settings_fields('pkl_rest_api_auth');
+                do_settings_sections('pkl_rest_api_auth');
                 submit_button();
                 ?>
             </form>
@@ -188,7 +188,7 @@ class PKL_WP_REST_API_Auth {
      */
     public function activate() {
         // Set default options
-        add_option('pkl_wp_rest_api_auth_enable', 1);
+        add_option('pkl_rest_api_auth_enable', 1);
     }
     
     /**
@@ -200,4 +200,4 @@ class PKL_WP_REST_API_Auth {
 }
 
 // Initialize the plugin
-new PKL_WP_REST_API_Auth();
+new PKL_REST_API_Auth();
