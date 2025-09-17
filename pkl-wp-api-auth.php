@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('PKL_REST_API_AUTH_VERSION', '1.0.0');
+define('PKL_REST_API_AUTH_VERSION', '1.1.0');
 define('PKL_REST_API_AUTH_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('PKL_REST_API_AUTH_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -306,4 +306,5 @@ class PKL_REST_API_Auth {
 
 // Initialize the plugin
 new PKL_REST_API_Auth();
+
 
