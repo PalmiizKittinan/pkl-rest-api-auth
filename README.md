@@ -1,4 +1,4 @@
-# 🔐 PKL WP REST API Auth
+# 🔐 PKL REST API Auth
 
 A lightweight WordPress plugin that controls access to the REST API by requiring user authentication.  
 This helps improve security by preventing unauthorized access to REST API endpoints for non-logged-in users.
