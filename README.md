@@ -27,7 +27,7 @@ This helps improve security by preventing unauthorized access to REST API endpoi
 
 1. Download or clone this repository into your WordPress `wp-content/plugins/` directory:
    ```bash
-   git clone https://github.com/PalmiizKittinan/pkl-wp-rest-api-auth.git
+   git clone https://github.com/PalmiizKittinan/pkl-rest-api-auth.git
    ```
 2. Activate the plugin via the **WordPress Admin Dashboard** → **Plugins**.
 3. Go to **Settings** → **PKL REST API Auth** to configure authentication settings.
