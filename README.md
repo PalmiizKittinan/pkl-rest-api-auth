@@ -15,7 +15,7 @@ This helps improve security by preventing unauthorized access to REST API endpoi
 
 ---
 
-## 📋 Requirements
+## 📋 WordPress Requirements
 
 - **WordPress:** 5.0 or higher
 - **Tested up to:** 6.8
