@@ -93,7 +93,7 @@ Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard
 ## 👤 Author
 
 - **Author:** [Kittinan Lamkaek](https://github.com/PalmiizKittinan)  
-- **Plugin URI:** [PKL WP REST API Auth](https://github.com/PalmiizKittinan/pkl-wp-rest-api-auth)
+- **Plugin URI:** [PKL REST API Auth](https://github.com/PalmiizKittinan/pkl-wp-rest-api-auth)
 
 ---
 
