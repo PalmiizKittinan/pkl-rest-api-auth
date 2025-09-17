@@ -17,9 +17,9 @@ This helps improve security by preventing unauthorized access to REST API endpoi
 
 ## 📋 Requirements
 
-- **WordPress:** 5.0 or higher  
-- **Tested up to:** 6.6  
-- **PHP:** 7.4 or higher  
+- **WordPress:** 5.0 or higher
+- **Tested up to:** 6.6
+- **PHP:** 7.4 or higher
 
 ---
 
@@ -36,8 +36,8 @@ This helps improve security by preventing unauthorized access to REST API endpoi
 
 ## 🚀 Usage
 
-- When enabled, the plugin blocks unauthenticated access to the WordPress REST API.  
-- If a non-logged-in user tries to access the API, they will receive a `401 Unauthorized` error:  
+- When enabled, the plugin blocks unauthenticated access to the WordPress REST API.
+- If a non-logged-in user tries to access the API, they will receive a `401 Unauthorized` error:
 
 ```json
 {
@@ -49,7 +49,7 @@ This helps improve security by preventing unauthorized access to REST API endpoi
 }
 ```
 
-- If a logged-in user does not have sufficient permissions, they will receive a `403 Forbidden` error:  
+- If a logged-in user does not have sufficient permissions, they will receive a `403 Forbidden` error:
 
 ```json
 {
@@ -67,9 +67,9 @@ This helps improve security by preventing unauthorized access to REST API endpoi
 
 Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard:
 
-- **Enable REST API Authentication**  
-  - ✅ Checked: Only logged-in users can access the REST API.  
-  - ⬜ Unchecked: REST API remains open as usual.
+- **Enable REST API Authentication**
+    - ✅ Checked: Only logged-in users can access the REST API.
+    - ⬜ Unchecked: REST API remains open as usual.
 
 ---
 
@@ -82,11 +82,11 @@ Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard
 - Make your changes.
 - Submit a pull request for contributions.
 
----
+### 🌐 For Development API Platform
 
-## 🌐 For API Testing
-### 🛡️ Credential Method with Registered Email
-- **Method 1: Form-data (Recommended for Postman)**
+#### 🛡️ Credential Method with Registered Email
+
+- **Method 1: Form-data (Recommended)**
   ```markdown
   Key: email | Value: user@example.com
   ```
@@ -99,12 +99,11 @@ Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard
   ?email=user@example.com
   ```
 
-
 ---
 
 ## 👤 Author
 
-- **Author:** [Kittinan Lamkaek](https://github.com/PalmiizKittinan)  
+- **Author:** [Kittinan Lamkaek](https://github.com/PalmiizKittinan)
 
 ---
 
