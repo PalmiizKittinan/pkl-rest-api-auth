@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: PKL REST API Auth
- * Plugin URI: https://github.com/PalmiizKittinan/pkl-wp-rest-api-auth
+ * Plugin URI: https://github.com/PalmiizKittinan/pkl-rest-api-auth
  * Description: Control WordPress REST API access by requiring user authentication. Disable API access for non-logged-in users with customizable settings.
  * Version: 1.1.0
  * Author: Kittinan Lamkaek
@@ -69,18 +69,21 @@ class PKL_REST_API_Auth {
      * @return bool|WP_User
      */
     private function check_email_auth() {
-        // Check for email in POST data (form-data)
         $email = '';
         
-        // Check in $_POST
+        // Check in $_POST (with proper sanitization and unslashing)
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- This is for API authentication, not form processing
         if (isset($_POST['email']) && !empty($_POST['email'])) {
-            $email = sanitize_email($_POST['email']);
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.NonceVerification.Missing
+            $email = sanitize_email(wp_unslash($_POST['email']));
         }
         
         // Check in raw input for form-data
         if (empty($email)) {
             $input = file_get_contents('php://input');
-            if (strpos($_SERVER['CONTENT_TYPE'] ?? '', 'multipart/form-data') !== false) {
+            $content_type = isset($_SERVER['CONTENT_TYPE']) ? sanitize_text_field(wp_unslash($_SERVER['CONTENT_TYPE'])) : '';
+            
+            if (strpos($content_type, 'multipart/form-data') !== false) {
                 // Parse multipart form data manually
                 $boundary = substr($input, 0, strpos($input, "\r\n"));
                 $parts = array_slice(explode($boundary, $input), 1);
@@ -103,16 +106,20 @@ class PKL_REST_API_Auth {
         // Check in headers
         if (empty($email)) {
             $headers = getallheaders();
-            if (isset($headers['X-Email'])) {
-                $email = sanitize_email($headers['X-Email']);
-            } elseif (isset($headers['x-email'])) {
-                $email = sanitize_email($headers['x-email']);
+            if (is_array($headers)) {
+                if (isset($headers['X-Email'])) {
+                    $email = sanitize_email($headers['X-Email']);
+                } elseif (isset($headers['x-email'])) {
+                    $email = sanitize_email($headers['x-email']);
+                }
             }
         }
         
-        // Check in query parameters
+        // Check in query parameters (with proper sanitization and unslashing)
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This is for API authentication, not form processing
         if (empty($email) && isset($_GET['email'])) {
-            $email = sanitize_email($_GET['email']);
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.NonceVerification.Recommended
+            $email = sanitize_email(wp_unslash($_GET['email']));
         }
         
         if (!empty($email) && is_email($email)) {
@@ -263,7 +270,10 @@ class PKL_REST_API_Auth {
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
             
             <div class="notice notice-warning">
-                <h3><?php esc_html_e('Usage Instructions for Postman/API Testing:', 'pkl-rest-api-auth'); ?></h3>
+                <h3><?php esc_html_e('🛠️ Developer Guide', 'pkl-rest-api-auth'); ?></h3>
+                <h4><?php esc_html_e('🌐 For Development API Platform', 'pkl-rest-api-auth'); ?></h4>
+                <h5><?php esc_html_e('🛡️ Credential Method with Registered Email', 'pkl-rest-api-auth'); ?></h5>
+                
                 <h4><?php esc_html_e('Method 1: Form-data (Recommended for Postman)', 'pkl-rest-api-auth'); ?></h4>
                 <p><?php esc_html_e('Add to Body > form-data:', 'pkl-rest-api-auth'); ?></p>
                 <code>Key: email | Value: user@example.com</code>
@@ -306,5 +316,3 @@ class PKL_REST_API_Auth {
 
 // Initialize the plugin
 new PKL_REST_API_Auth();
-
-
