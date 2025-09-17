@@ -77,7 +77,7 @@ Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard
 
 - Clone the repo:
   ```bash
-  git clone https://github.com/PalmiizKittinan/pkl-wp-rest-api-auth.git
+  git clone https://github.com/PalmiizKittinan/pkl-rest-api-auth.git
   ```
 - Make your changes.
 - Submit a pull request for contributions.
