@@ -87,15 +87,15 @@ Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard
 ## 🌐 For API Testing
 ### 🛡️ Credential Method
 - **Method 1: Form-data (Recommended for Postman)**
-- ```markdown
+  ```markdown
   Key: email | Value: user@example.com
   ```
 - **Method 2: Header**
-- ```markdown
+  ```markdown
   X-Email: user@example.com
   ```
 - **Method 3: Query Parameter**
-- ```markdown
+  ```markdown
   ?email=user@example.com
   ```
 
