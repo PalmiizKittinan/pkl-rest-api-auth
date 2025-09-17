@@ -9,11 +9,9 @@
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: pkl-wp-rest-api-auth
- * Domain Path: /languages
  * Requires at least: 5.0
- * Tested up to: 6.4
+ * Tested up to: 6.8
  * Requires PHP: 7.4
- * Network: false
  */
 
 // Prevent direct access
@@ -22,7 +20,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('PKL_WP_REST_API_AUTH_VERSION', '1.0.2');
+define('PKL_WP_REST_API_AUTH_VERSION', '1.0.0');
 define('PKL_WP_REST_API_AUTH_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('PKL_WP_REST_API_AUTH_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -44,9 +42,6 @@ class PKL_WP_REST_API_Auth {
      * Initialize the plugin
      */
     public function init() {
-        // Load text domain for translations
-        load_plugin_textdomain('pkl-wp-rest-api-auth', false, dirname(plugin_basename(__FILE__)) . '/languages');
-        
         // Add settings page
         if (is_admin()) {
             add_action('admin_menu', array($this, 'add_admin_menu'));
@@ -115,10 +110,27 @@ class PKL_WP_REST_API_Auth {
     }
     
     /**
+     * Sanitize checkbox input
+     *
+     * @param mixed $input
+     * @return int
+     */
+    public function sanitize_checkbox($input) {
+        return isset($input) && $input == 1 ? 1 : 0;
+    }
+    
+    /**
      * Initialize settings
      */
     public function settings_init() {
-        register_setting('pkl_wp_rest_api_auth', 'pkl_wp_rest_api_auth_enable');
+        register_setting(
+            'pkl_wp_rest_api_auth', 
+            'pkl_wp_rest_api_auth_enable',
+            array(
+                'sanitize_callback' => array($this, 'sanitize_checkbox'),
+                'default' => 1
+            )
+        );
         
         add_settings_section(
             'pkl_wp_rest_api_auth_section',
@@ -148,7 +160,7 @@ class PKL_WP_REST_API_Auth {
      */
     public function enable_field_callback() {
         $enable = get_option('pkl_wp_rest_api_auth_enable', 1);
-        echo '<input type="checkbox" name="pkl_wp_rest_api_auth_enable" value="1" ' . checked(1, $enable, false) . ' />';
+        echo '<input type="checkbox" id="pkl_wp_rest_api_auth_enable" name="pkl_wp_rest_api_auth_enable" value="1" ' . checked(1, $enable, false) . ' />';
         echo '<label for="pkl_wp_rest_api_auth_enable">' . esc_html__('Require authentication for REST API access', 'pkl-wp-rest-api-auth') . '</label>';
         echo '<p class="description">' . esc_html__('When enabled, only logged-in users can access the WordPress REST API.', 'pkl-wp-rest-api-auth') . '</p>';
     }
@@ -188,5 +200,4 @@ class PKL_WP_REST_API_Auth {
 }
 
 // Initialize the plugin
-
 new PKL_WP_REST_API_Auth();
