@@ -124,14 +124,14 @@ Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard
     - **POST** | https://`<your-wordpress-url>`/wp-json/wp/v2/posts
 
         - Method 1: Authorization Header (Recommended) 👍
-          ```markdown
+          ```text
           Headers:
           
           Authorization: Bearer <your_access_token_here>
           ```
 
         - Method 2: Form-data
-          ```markdown
+          ```text
           Form-data:
           
           access_token: <your_access_token_here>
