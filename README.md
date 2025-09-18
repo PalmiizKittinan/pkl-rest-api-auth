@@ -2,8 +2,9 @@
 
 A lightweight WordPress plugin that controls access to the REST API by requiring user authentication.  
 This helps improve security by preventing unauthorized access to REST API endpoints for non-logged-in or not registered users.
+
 #### 🌐 For WordPress REST API URL Endpoint
-> ./wp-json
+> ./wp-json/<WP_REST_API_ENDPOINT>
 
 ---
 
@@ -84,22 +85,60 @@ Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard
 - Make your changes.
 - Submit a pull request for contributions.
 
-### 🌐 For Development API Platform
+---
 
-#### 🛡️ Credential Method with Registered Email (WordPress User Email)
+## 🌐 For Development API Platform
 
-- **Method 1: Form-data (Recommended)**
-  ```markdown
-  Key: email | Value: user@example.com
-  ```
-- **Method 2: Header**
-  ```markdown
-  X-Email: user@example.com
-  ```
-- **Method 3: Query Parameter**
-  ```markdown
-  ?email=user@example.com
-  ```
+> Using `<access_tokens>` for All API Endpoint Authentication
+
+### 📖 API Usage Guide
+
+1. 🔐 **Generate Access Token**
+    - **Send a POST request to get an access token:**
+        - **POST** | *https://<your-wordpress-url>/wp-json/oauth/token*
+      ```json
+      {
+        "email": "user@example.com"
+      }
+      ```
+
+        - Response (JSON):
+      ```json
+      {
+        "access_token": "abcd1234...",
+        "token_type": "Bearer",
+        "user": {
+          "id": 1,
+          "login": "username",
+          "email": "user@example.com",
+          "display_name": "Display Name"
+        },
+        "created_at": "2024-01-01 12:00:00",
+        "status": "active"
+      }
+      ```
+
+2. 🚀 **Use Access Token**
+    - **Include the access token in your API requests using one of these methods:**
+
+    - **POST** | *https://<your-wordpress-url>/wp-json/wp/v2/posts*
+
+        - Method 1: Authorization Header (Recommended) 👍
+          ```markdown
+          Headers:
+          
+          Authorization: Bearer <your_access_token_here>
+          ```
+
+        - Method 2: Form-data
+          ```markdown
+          Form-data:
+          
+          access_token: <your_access_token_here>
+          title: Test Post
+          content: Post content here
+          status: publish | draft | pending | private | future
+          ```
 
 ---
 
