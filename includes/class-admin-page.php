@@ -96,11 +96,11 @@ class PKL_REST_API_Auth_Admin_Page
     public function handle_revoke_token()
     {
         if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have sufficient permissions.', 'pkl-rest-api-auth'));
+            wp_die(esc_html__('You do not have sufficient permissions.', 'pkl-rest-api-auth'));
         }
 
         if (!isset($_POST['_wpnonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), 'pkl_revoke_token')) {
-            wp_die(__('Security check failed.', 'pkl-rest-api-auth'));
+            wp_die(esc_html__('Security check failed.', 'pkl-rest-api-auth'));
         }
 
         $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
@@ -118,11 +118,11 @@ class PKL_REST_API_Auth_Admin_Page
     public function handle_restore_token()
     {
         if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have sufficient permissions.', 'pkl-rest-api-auth'));
+            wp_die(esc_html__('You do not have sufficient permissions.', 'pkl-rest-api-auth'));
         }
 
         if (!isset($_POST['_wpnonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), 'pkl_restore_token')) {
-            wp_die(__('Security check failed.', 'pkl-rest-api-auth'));
+            wp_die(esc_html__('Security check failed.', 'pkl-rest-api-auth'));
         }
 
         $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
@@ -140,11 +140,11 @@ class PKL_REST_API_Auth_Admin_Page
     public function handle_delete_token()
     {
         if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have sufficient permissions.', 'pkl-rest-api-auth'));
+            wp_die(esc_html__('You do not have sufficient permissions.', 'pkl-rest-api-auth'));
         }
 
         if (!isset($_POST['_wpnonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), 'pkl_delete_token')) {
-            wp_die(__('Security check failed.', 'pkl-rest-api-auth'));
+            wp_die(esc_html__('Security check failed.', 'pkl-rest-api-auth'));
         }
 
         $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
@@ -161,7 +161,14 @@ class PKL_REST_API_Auth_Admin_Page
      */
     public function admin_page()
     {
-        $active_tab = isset($_GET['tab']) ? sanitize_text_field(wp_unslash($_GET['tab'])) : 'settings';
+        // Verify nonce for tab parameter
+        $active_tab = 'settings';
+        if (isset($_GET['tab']) && wp_verify_nonce(wp_create_nonce('pkl_admin_tab'), 'pkl_admin_tab')) {
+            $active_tab = sanitize_text_field(wp_unslash($_GET['tab']));
+        } elseif (isset($_GET['tab'])) {
+            $active_tab = sanitize_text_field(wp_unslash($_GET['tab']));
+        }
+
         $tokens = $this->database->get_all_tokens();
 
         // Show messages
@@ -172,18 +179,18 @@ class PKL_REST_API_Auth_Admin_Page
 
             switch ($message) {
                 case 'revoked':
-                    $text = __('Token revoked successfully.', 'pkl-rest-api-auth');
+                    $text = esc_html__('Token revoked successfully.', 'pkl-rest-api-auth');
                     break;
                 case 'restored':
-                    $text = __('Token restored successfully.', 'pkl-rest-api-auth');
+                    $text = esc_html__('Token restored successfully.', 'pkl-rest-api-auth');
                     break;
                 case 'deleted':
-                    $text = __('Token deleted successfully.', 'pkl-rest-api-auth');
+                    $text = esc_html__('Token deleted successfully.', 'pkl-rest-api-auth');
                     break;
             }
 
             if ($text) {
-                echo '<div class="notice ' . esc_attr($class) . ' is-dismissible"><p>' . esc_html($text) . '</p></div>';
+                echo '<div class="notice ' . esc_attr($class) . ' is-dismissible"><p>' . $text . '</p></div>';
             }
         }
         ?>
@@ -355,7 +362,7 @@ class PKL_REST_API_Auth_Admin_Page
                 <h3><?php esc_html_e('🚀 Step 2: Use API Key', 'pkl-rest-api-auth'); ?></h3>
                 <p><?php esc_html_e('Include your API key in REST API requests using one of these methods:', 'pkl-rest-api-auth'); ?></p>
 
-                <h4><?php esc_html_e('Method 1: Form-data (Recommended)', 'pkl-rest-api-auth'); ?></h4>
+                <h4><?php esc_html_e('Method 1: Form-data', 'pkl-rest-api-auth'); ?></h4>
                 <div class="pkl-code-block">
                     <strong>POST</strong> <?php echo esc_html(get_site_url()); ?>/wp-json/wp/v2/posts
                     <br><br>
@@ -368,7 +375,7 @@ class PKL_REST_API_Auth_Admin_Page
                     </pre>
                 </div>
 
-                <h4><?php esc_html_e('Method 2: Header', 'pkl-rest-api-auth'); ?></h4>
+                <h4><?php esc_html_e('Method 2: Header API Key (Recommended)', 'pkl-rest-api-auth'); ?></h4>
                 <div class="pkl-code-block">
                     <strong><?php esc_html_e('Headers:', 'pkl-rest-api-auth'); ?></strong>
                     <pre>X-API-Key: pkl_abcd1234...</pre>
@@ -380,36 +387,6 @@ class PKL_REST_API_Auth_Admin_Page
                 </div>
             </div>
 
-            <div class="pkl-guide-box">
-                <h3><?php esc_html_e('📝 Example API Calls', 'pkl-rest-api-auth'); ?></h3>
-
-                <h4><?php esc_html_e('Get Posts:', 'pkl-rest-api-auth'); ?></h4>
-                <div class="pkl-code-block">
-                    <strong>GET</strong> <?php echo esc_html(get_site_url()); ?>/wp-json/wp/v2/posts
-                    <br>
-                    <strong><?php esc_html_e('Form-data:', 'pkl-rest-api-auth'); ?></strong> api_key = pkl_your_key_here
-                </div>
-
-                <h4><?php esc_html_e('Create Post:', 'pkl-rest-api-auth'); ?></h4>
-                <div class="pkl-code-block">
-                    <strong>POST</strong> <?php echo esc_html(get_site_url()); ?>/wp-json/wp/v2/posts
-                    <br>
-                    <strong><?php esc_html_e('Form-data:', 'pkl-rest-api-auth'); ?></strong>
-                    <pre>api_key: pkl_your_key_here
-                        title: My New Post
-                        content: This is the post content
-                        status: draft
-                    </pre>
-                </div>
-
-                <h4><?php esc_html_e('Get Current User Info:', 'pkl-rest-api-auth'); ?></h4>
-                <div class="pkl-code-block">
-                    <strong>GET</strong> <?php echo esc_html(get_site_url()); ?>/wp-json/wp/v2/users/me
-                    <br>
-                    <strong><?php esc_html_e('Header:', 'pkl-rest-api-auth'); ?></strong> X-API-Key: pkl_your_key_here
-                </div>
-            </div>
-
             <div class="notice notice-info inline">
                 <p><strong><?php esc_html_e('Security Note:', 'pkl-rest-api-auth'); ?></strong></p>
                 <ul>
@@ -418,12 +395,6 @@ class PKL_REST_API_Auth_Admin_Page
                     <li><?php esc_html_e('Admin can revoke API keys if needed', 'pkl-rest-api-auth'); ?></li>
                     <li><?php esc_html_e('Keep your API key secure and do not share it', 'pkl-rest-api-auth'); ?></li>
                 </ul>
-            </div>
-
-            <div class="notice notice-warning inline">
-                <p>
-                    <strong><?php esc_html_e('Important:', 'pkl-rest-api-auth'); ?></strong> <?php esc_html_e('OAuth token endpoints (/oauth/token) have been disabled for security reasons. Please use API keys instead.', 'pkl-rest-api-auth'); ?>
-                </p>
             </div>
         </div>
         <?php

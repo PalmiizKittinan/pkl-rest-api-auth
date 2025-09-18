@@ -201,16 +201,15 @@ class PKL_REST_API_Auth_User_Profile
     /**
      * AJAX: Generate API key
      */
-    public function ajax_generate_api_key()
-    {
+    public function ajax_generate_api_key() {
         check_ajax_referer('pkl_api_key_action');
 
-        $user_id = intval($_POST['user_id']);
+        $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : 0;
         $current_user_id = get_current_user_id();
 
         // Security check
         if ($user_id !== $current_user_id && !current_user_can('manage_options')) {
-            wp_die(__('You do not have permission to perform this action.', 'pkl-rest-api-auth'));
+            wp_die(esc_html__('You do not have permission to perform this action.', 'pkl-rest-api-auth'));
         }
 
         $api_key = $this->database->generate_api_key($user_id);
@@ -218,31 +217,30 @@ class PKL_REST_API_Auth_User_Profile
         if ($api_key) {
             wp_send_json_success(array(
                 'api_key' => $api_key,
-                'message' => __('API key generated successfully.', 'pkl-rest-api-auth')
+                'message' => esc_html__('API key generated successfully.', 'pkl-rest-api-auth')
             ));
         } else {
-            wp_send_json_error(__('Failed to generate API key.', 'pkl-rest-api-auth'));
+            wp_send_json_error(esc_html__('Failed to generate API key.', 'pkl-rest-api-auth'));
         }
     }
 
     /**
      * AJAX: Revoke API key
      */
-    public function ajax_revoke_api_key()
-    {
+    public function ajax_revoke_api_key() {
         check_ajax_referer('pkl_api_key_action');
 
-        $user_id = intval($_POST['user_id']);
+        $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : 0;
         $current_user_id = get_current_user_id();
 
         // Security check
         if ($user_id !== $current_user_id && !current_user_can('manage_options')) {
-            wp_die(__('You do not have permission to perform this action.', 'pkl-rest-api-auth'));
+            wp_die(esc_html__('You do not have permission to perform this action.', 'pkl-rest-api-auth'));
         }
 
         $user = get_userdata($user_id);
         if (!$user) {
-            wp_send_json_error(__('User not found.', 'pkl-rest-api-auth'));
+            wp_send_json_error(esc_html__('User not found.', 'pkl-rest-api-auth'));
         }
 
         global $wpdb;
@@ -257,9 +255,9 @@ class PKL_REST_API_Auth_User_Profile
         );
 
         if ($result !== false) {
-            wp_send_json_success(__('API key revoked successfully.', 'pkl-rest-api-auth'));
+            wp_send_json_success(esc_html__('API key revoked successfully.', 'pkl-rest-api-auth'));
         } else {
-            wp_send_json_error(__('Failed to revoke API key.', 'pkl-rest-api-auth'));
+            wp_send_json_error(esc_html__('Failed to revoke API key.', 'pkl-rest-api-auth'));
         }
     }
 }

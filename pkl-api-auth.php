@@ -128,18 +128,20 @@ class PKL_REST_API_Auth {
             add_filter('rest_authentication_errors', array($this, 'restrict_rest_api'));
         }
     }
-    
+
     /**
      * Check if API key authentication is provided
      */
     private function check_api_key_auth() {
         $api_key = '';
-        
+
         // Check in form-data
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- This is for API authentication, not form processing
         if (isset($_POST['api_key']) && !empty($_POST['api_key'])) {
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.NonceVerification.Missing
             $api_key = sanitize_text_field(wp_unslash($_POST['api_key']));
         }
-        
+
         // Check in headers
         if (empty($api_key)) {
             $headers = getallheaders();
@@ -151,19 +153,21 @@ class PKL_REST_API_Auth {
                 }
             }
         }
-        
+
         // Check in query parameters
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This is for API authentication, not form processing
         if (empty($api_key) && isset($_GET['api_key'])) {
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.NonceVerification.Recommended
             $api_key = sanitize_text_field(wp_unslash($_GET['api_key']));
         }
-        
+
         if (!empty($api_key)) {
             $user = $this->database->get_user_by_token($api_key);
             if ($user && !$user['revoked']) {
                 return get_user_by('login', $user['user_login']);
             }
         }
-        
+
         return false;
     }
     
