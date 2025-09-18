@@ -4,7 +4,7 @@ A lightweight WordPress plugin that controls access to the REST API by requiring
 This helps improve security by preventing unauthorized access to REST API endpoints for non-logged-in or not registered users.
 
 #### 🌐 For WordPress REST API URL Endpoint
-> ./wp-json/<WP_REST_API_ENDPOINT>
+> https://`<your-wordpress-url>`/wp-json/<WP_REST_API_ENDPOINT>
 
 ---
 
