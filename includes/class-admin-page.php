@@ -336,68 +336,47 @@ class PKL_REST_API_Auth_Admin_Page
      */
     private function render_guide_tab()
     {
-        $site_url = get_site_url();
         ?>
         <div class="pkl-guide-section">
             <h2><?php esc_html_e('API Usage Guide', 'pkl-rest-api-auth'); ?></h2>
 
             <div class="pkl-guide-box">
-                <h3><?php esc_html_e('🔐 Step 1: Generate Access Token', 'pkl-rest-api-auth'); ?></h3>
-                <p><?php esc_html_e('Send a POST request to get an access token:', 'pkl-rest-api-auth'); ?></p>
-                <div class="pkl-code-block">
-                    <strong>POST</strong> <?php echo esc_html($site_url); ?>/wp-json/oauth/token
-                    <br><br>
-                    <strong><?php esc_html_e('Request Body (JSON):', 'pkl-rest-api-auth'); ?></strong>
-                    <pre>{
-  "email": "user@example.com"
-}</pre>
-
-
-                    <strong><?php esc_html_e('Response:', 'pkl-rest-api-auth'); ?></strong>
-                    <pre>{
-  "access_token": "abcd1234...",
-  "token_type": "Bearer",
-  "user": {
-    "id": 1,
-    "login": "username",
-    "email": "user@example.com",
-    "display_name": "Display Name"
-  },
-  "created_at": "2024-01-01 12:00:00"
-}</pre>
-                </div>
+                <h3><?php esc_html_e('🔐 Step 1: Generate API Key', 'pkl-rest-api-auth'); ?></h3>
+                <p><?php esc_html_e('Go to your User Profile page and generate an API key:', 'pkl-rest-api-auth'); ?></p>
+                <ol>
+                    <li><?php esc_html_e('Navigate to Users → Your Profile (or Profile)', 'pkl-rest-api-auth'); ?></li>
+                    <li><?php esc_html_e('Scroll down to "REST API Access" section', 'pkl-rest-api-auth'); ?></li>
+                    <li><?php esc_html_e('Click "Generate API Key"', 'pkl-rest-api-auth'); ?></li>
+                    <li><?php esc_html_e('Copy your API key', 'pkl-rest-api-auth'); ?></li>
+                </ol>
             </div>
 
             <div class="pkl-guide-box">
-                <h3><?php esc_html_e('🚀 Step 2: Use Access Token', 'pkl-rest-api-auth'); ?></h3>
-                <p><?php esc_html_e('Include the access token in your API requests using one of these methods:', 'pkl-rest-api-auth'); ?></p>
+                <h3><?php esc_html_e('🚀 Step 2: Use API Key', 'pkl-rest-api-auth'); ?></h3>
+                <p><?php esc_html_e('Include your API key in REST API requests using one of these methods:', 'pkl-rest-api-auth'); ?></p>
 
                 <h4><?php esc_html_e('Method 1: Form-data (Recommended)', 'pkl-rest-api-auth'); ?></h4>
                 <div class="pkl-code-block">
-                    <strong>POST</strong> <?php echo esc_html($site_url); ?>/wp-json/wp/v2/posts
+                    <strong>POST</strong> <?php echo esc_html(get_site_url()); ?>/wp-json/wp/v2/posts
                     <br><br>
                     <strong><?php esc_html_e('Form-data:', 'pkl-rest-api-auth'); ?></strong>
-                    <pre>access_token: your_access_token_here
-title: Test Post
-content: Post content here
-status: draft</pre>
+                    <pre>
+                        api_key: pkl_abcd1234...
+                        title: Test Post
+                        content: Post content here
+                        status: draft
+                    </pre>
                 </div>
 
-                <h4><?php esc_html_e('Method 2: Authorization Header', 'pkl-rest-api-auth'); ?></h4>
+                <h4><?php esc_html_e('Method 2: Header', 'pkl-rest-api-auth'); ?></h4>
                 <div class="pkl-code-block">
                     <strong><?php esc_html_e('Headers:', 'pkl-rest-api-auth'); ?></strong>
-                    <pre>Authorization: Bearer your_access_token_here</pre>
+                    <pre>X-API-Key: pkl_abcd1234...</pre>
                 </div>
 
-                <h4><?php esc_html_e('Method 3: Custom Header', 'pkl-rest-api-auth'); ?></h4>
+                <h4><?php esc_html_e('Method 3: Query Parameter', 'pkl-rest-api-auth'); ?></h4>
                 <div class="pkl-code-block">
-                    <strong><?php esc_html_e('Headers:', 'pkl-rest-api-auth'); ?></strong>
-                    <pre>X-Access-Token: your_access_token_here</pre>
-                </div>
-
-                <h4><?php esc_html_e('Method 4: Query Parameter', 'pkl-rest-api-auth'); ?></h4>
-                <div class="pkl-code-block">
-                    <strong>GET</strong> <?php echo esc_html($site_url); ?>/wp-json/wp/v2/posts?access_token=your_access_token_here
+                    <strong>GET</strong> <?php echo esc_html(get_site_url()); ?>/wp-json/wp/v2/posts?api_key=pkl_abcd1234...
                 </div>
             </div>
 
@@ -406,26 +385,44 @@ status: draft</pre>
 
                 <h4><?php esc_html_e('Get Posts:', 'pkl-rest-api-auth'); ?></h4>
                 <div class="pkl-code-block">
-                    <strong>GET</strong> <?php echo esc_html($site_url); ?>/wp-json/wp/v2/posts
+                    <strong>GET</strong> <?php echo esc_html(get_site_url()); ?>/wp-json/wp/v2/posts
                     <br>
-                    <strong><?php esc_html_e('Form-data:', 'pkl-rest-api-auth'); ?></strong> access_token = your_token_here
+                    <strong><?php esc_html_e('Form-data:', 'pkl-rest-api-auth'); ?></strong> api_key = pkl_your_key_here
                 </div>
 
                 <h4><?php esc_html_e('Create Post:', 'pkl-rest-api-auth'); ?></h4>
                 <div class="pkl-code-block">
-                    <strong>POST</strong> <?php echo esc_html($site_url); ?>/wp-json/wp/v2/posts
+                    <strong>POST</strong> <?php echo esc_html(get_site_url()); ?>/wp-json/wp/v2/posts
                     <br>
                     <strong><?php esc_html_e('Form-data:', 'pkl-rest-api-auth'); ?></strong>
-                    <pre>access_token: your_token_here
-title: My New Post
-content: This is the post content
-status: draft</pre>
+                    <pre>api_key: pkl_your_key_here
+                        title: My New Post
+                        content: This is the post content
+                        status: draft
+                    </pre>
+                </div>
+
+                <h4><?php esc_html_e('Get Current User Info:', 'pkl-rest-api-auth'); ?></h4>
+                <div class="pkl-code-block">
+                    <strong>GET</strong> <?php echo esc_html(get_site_url()); ?>/wp-json/wp/v2/users/me
+                    <br>
+                    <strong><?php esc_html_e('Header:', 'pkl-rest-api-auth'); ?></strong> X-API-Key: pkl_your_key_here
                 </div>
             </div>
 
             <div class="notice notice-info inline">
+                <p><strong><?php esc_html_e('Security Note:', 'pkl-rest-api-auth'); ?></strong></p>
+                <ul>
+                    <li><?php esc_html_e('API keys are unique to each user and cannot be guessed', 'pkl-rest-api-auth'); ?></li>
+                    <li><?php esc_html_e('Only you can generate your API key through your profile page', 'pkl-rest-api-auth'); ?></li>
+                    <li><?php esc_html_e('Admin can revoke API keys if needed', 'pkl-rest-api-auth'); ?></li>
+                    <li><?php esc_html_e('Keep your API key secure and do not share it', 'pkl-rest-api-auth'); ?></li>
+                </ul>
+            </div>
+
+            <div class="notice notice-warning inline">
                 <p>
-                    <strong><?php esc_html_e('Note:', 'pkl-rest-api-auth'); ?></strong> <?php esc_html_e('Only registered users can generate access tokens. The email must exist in your WordPress user database.', 'pkl-rest-api-auth'); ?>
+                    <strong><?php esc_html_e('Important:', 'pkl-rest-api-auth'); ?></strong> <?php esc_html_e('OAuth token endpoints (/oauth/token) have been disabled for security reasons. Please use API keys instead.', 'pkl-rest-api-auth'); ?>
                 </p>
             </div>
         </div>

@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('PKL_REST_API_AUTH_VERSION', '2.0.0');
+define('PKL_REST_API_AUTH_VERSION', '2.1.0');
 define('PKL_REST_API_AUTH_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('PKL_REST_API_AUTH_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('PKL_REST_API_AUTH_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -131,85 +131,6 @@ class PKL_REST_API_Auth
     }
 
     /**
-     * Check if access token authentication is provided
-     */
-    private function check_token_auth()
-    {
-        $access_token = '';
-
-        // Check in form-data
-        if (isset($_POST['access_token']) && !empty($_POST['access_token'])) {
-            $access_token = sanitize_text_field(wp_unslash($_POST['access_token']));
-        }
-
-        // Check in headers
-        if (empty($access_token)) {
-            $headers = getallheaders();
-            if (is_array($headers)) {
-                if (isset($headers['Authorization'])) {
-                    $auth_header = $headers['Authorization'];
-                    if (strpos($auth_header, 'Bearer ') === 0) {
-                        $access_token = sanitize_text_field(substr($auth_header, 7));
-                    }
-                } elseif (isset($headers['X-Access-Token'])) {
-                    $access_token = sanitize_text_field($headers['X-Access-Token']);
-                }
-            }
-        }
-
-        // Check in query parameters
-        if (empty($access_token) && isset($_GET['access_token'])) {
-            $access_token = sanitize_text_field(wp_unslash($_GET['access_token']));
-        }
-
-        if (!empty($access_token)) {
-            $user = $this->database->get_user_by_token($access_token);
-            if ($user && !$user['revoked']) {
-                return get_user_by('login', $user['user_login']);
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Check if email authentication is provided (legacy support)
-     */
-    private function check_email_auth()
-    {
-        $email = '';
-
-        // Check in $_POST
-        if (isset($_POST['email']) && !empty($_POST['email'])) {
-            $email = sanitize_email(wp_unslash($_POST['email']));
-        }
-
-        // Check in headers
-        if (empty($email)) {
-            $headers = getallheaders();
-            if (is_array($headers)) {
-                if (isset($headers['X-Email'])) {
-                    $email = sanitize_email($headers['X-Email']);
-                }
-            }
-        }
-
-        // Check in query parameters
-        if (empty($email) && isset($_GET['email'])) {
-            $email = sanitize_email(wp_unslash($_GET['email']));
-        }
-
-        if (!empty($email) && is_email($email)) {
-            $user = get_user_by('email', $email);
-            if ($user && !is_wp_error($user)) {
-                return $user;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Restrict REST API access
      */
     public function restrict_rest_api($result)
@@ -231,36 +152,8 @@ class PKL_REST_API_Auth
             return $result;
         }
 
-        // Check for API key authentication
+        // Check for API key authentication only
         $user = $this->check_api_key_auth();
-        if ($user) {
-            wp_set_current_user($user->ID);
-            if (!current_user_can('read')) {
-                return new WP_Error(
-                    'rest_insufficient_permissions',
-                    __('You do not have sufficient permissions to access this API.', 'pkl-rest-api-auth'),
-                    array('status' => 403)
-                );
-            }
-            return $result;
-        }
-
-        // Check for access token authentication (legacy support)
-        $user = $this->check_token_auth();
-        if ($user) {
-            wp_set_current_user($user->ID);
-            if (!current_user_can('read')) {
-                return new WP_Error(
-                    'rest_insufficient_permissions',
-                    __('You do not have sufficient permissions to access this API.', 'pkl-rest-api-auth'),
-                    array('status' => 403)
-                );
-            }
-            return $result;
-        }
-
-        // Check for email authentication (legacy support)
-        $user = $this->check_email_auth();
         if ($user) {
             wp_set_current_user($user->ID);
             if (!current_user_can('read')) {
@@ -276,7 +169,7 @@ class PKL_REST_API_Auth
         // No authentication found
         return new WP_Error(
             'rest_not_logged_in',
-            __('You are not currently logged in. Please provide a valid API key.', 'pkl-rest-api-auth'),
+            __('You are not currently logged in. Please provide a valid API key via your user profile.', 'pkl-rest-api-auth'),
             array('status' => 401)
         );
     }

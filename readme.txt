@@ -75,3 +75,8 @@ Initial release of PKL REST API Auth plugin.
 = 2.0.1 =
 * Bug Fixed
   * User utf8mb4_bin Schema For Plugin Table
+
+= 2.1.0 =
+* OAuth Credential with API Key
+* Access Token No-Longer Support
+* Add User Manual
