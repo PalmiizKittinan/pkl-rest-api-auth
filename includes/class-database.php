@@ -68,18 +68,21 @@ class PKL_REST_API_Auth_Database
         // Check if user already has a token
         $existing = $wpdb->get_row(
             $wpdb->prepare(
-                "SELECT id FROM {$this->table_name} WHERE user_login = %s",
+                "SELECT id, revoked FROM {$this->table_name} WHERE user_login = %s",
                 $user->user_login
             )
         );
 
         if ($existing) {
+            // Keep the previous revoked status when updating
+            $revoked_status = $existing->revoked;
+
             // Update existing token
             $result = $wpdb->update(
                 $this->table_name,
                 array(
                     'access_token' => $access_token,
-                    'revoked' => 0,
+                    'revoked' => $revoked_status, // Keep previous status
                     'created_at' => current_time('mysql')
                 ),
                 array('user_login' => $user->user_login),
@@ -87,7 +90,7 @@ class PKL_REST_API_Auth_Database
                 array('%s')
             );
         } else {
-            // Insert new token
+            // Insert new token (default revoked = 0 for new users)
             $result = $wpdb->insert(
                 $this->table_name,
                 array(

@@ -82,7 +82,11 @@ class PKL_REST_API_Auth_OAuth_API
             );
         }
 
-        return rest_ensure_response(array(
+        // Check if token is revoked
+        $token_data = $this->database->get_user_by_token($access_token);
+        $is_revoked = $token_data && $token_data['revoked'];
+
+        $response = array(
             'access_token' => $access_token,
             'token_type' => 'Bearer',
             'user' => array(
@@ -92,6 +96,16 @@ class PKL_REST_API_Auth_OAuth_API
                 'display_name' => $user->display_name
             ),
             'created_at' => current_time('mysql')
-        ));
+        );
+
+        // Add warning if token is revoked
+        if ($is_revoked) {
+            $response['warning'] = __('This token has been revoked by administrator. Please contact admin to restore access.', 'pkl-rest-api-auth');
+            $response['status'] = 'revoked';
+        } else {
+            $response['status'] = 'active';
+        }
+
+        return rest_ensure_response($response);
     }
 }
