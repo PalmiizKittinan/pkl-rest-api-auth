@@ -79,10 +79,12 @@ class PKL_REST_API_Auth
         require_once PKL_REST_API_AUTH_PLUGIN_DIR . 'includes/class-database.php';
         require_once PKL_REST_API_AUTH_PLUGIN_DIR . 'includes/class-oauth-api.php';
         require_once PKL_REST_API_AUTH_PLUGIN_DIR . 'includes/class-admin-page.php';
+        require_once PKL_REST_API_AUTH_PLUGIN_DIR . 'includes/class-user-profile.php';
 
         $this->database = new PKL_REST_API_Auth_Database();
         $this->oauth_api = new PKL_REST_API_Auth_OAuth_API($this->database);
         $this->admin_page = new PKL_REST_API_Auth_Admin_Page($this->database);
+        $this->user_profile = new PKL_REST_API_Auth_User_Profile($this->database);
     }
 
     /**
@@ -106,6 +108,7 @@ class PKL_REST_API_Auth
 
         // Initialize components
         $this->oauth_api->init();
+        $this->user_profile->init();
 
         if (is_admin()) {
             $this->admin_page->init();
@@ -216,12 +219,6 @@ class PKL_REST_API_Auth
             return $result;
         }
 
-        // Skip authentication for OAuth token endpoint
-        $request_uri = isset($_SERVER['REQUEST_URI']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])) : '';
-        if (strpos($request_uri, '/wp-json/oauth/token') !== false) {
-            return $result;
-        }
-
         // Check if user is logged in (traditional authentication)
         if (is_user_logged_in()) {
             if (!current_user_can('read')) {
@@ -234,7 +231,21 @@ class PKL_REST_API_Auth
             return $result;
         }
 
-        // Check for access token authentication (priority)
+        // Check for API key authentication
+        $user = $this->check_api_key_auth();
+        if ($user) {
+            wp_set_current_user($user->ID);
+            if (!current_user_can('read')) {
+                return new WP_Error(
+                    'rest_insufficient_permissions',
+                    __('You do not have sufficient permissions to access this API.', 'pkl-rest-api-auth'),
+                    array('status' => 403)
+                );
+            }
+            return $result;
+        }
+
+        // Check for access token authentication (legacy support)
         $user = $this->check_token_auth();
         if ($user) {
             wp_set_current_user($user->ID);
@@ -265,7 +276,7 @@ class PKL_REST_API_Auth
         // No authentication found
         return new WP_Error(
             'rest_not_logged_in',
-            __('You are not currently logged in. Please provide a valid access token or email address.', 'pkl-rest-api-auth'),
+            __('You are not currently logged in. Please provide a valid API key.', 'pkl-rest-api-auth'),
             array('status' => 401)
         );
     }
@@ -288,6 +299,45 @@ class PKL_REST_API_Auth
     public function deactivate()
     {
         // Clean up if needed
+    }
+
+    /**
+     * Check if API key authentication is provided
+     */
+    private function check_api_key_auth()
+    {
+        $api_key = '';
+
+        // Check in form-data
+        if (isset($_POST['api_key']) && !empty($_POST['api_key'])) {
+            $api_key = sanitize_text_field(wp_unslash($_POST['api_key']));
+        }
+
+        // Check in headers
+        if (empty($api_key)) {
+            $headers = getallheaders();
+            if (is_array($headers)) {
+                if (isset($headers['X-API-Key'])) {
+                    $api_key = sanitize_text_field($headers['X-API-Key']);
+                } elseif (isset($headers['x-api-key'])) {
+                    $api_key = sanitize_text_field($headers['x-api-key']);
+                }
+            }
+        }
+
+        // Check in query parameters
+        if (empty($api_key) && isset($_GET['api_key'])) {
+            $api_key = sanitize_text_field(wp_unslash($_GET['api_key']));
+        }
+
+        if (!empty($api_key)) {
+            $user = $this->database->get_user_by_token($api_key);
+            if ($user && !$user['revoked']) {
+                return get_user_by('login', $user['user_login']);
+            }
+        }
+
+        return false;
     }
 }
 

@@ -185,4 +185,86 @@ class PKL_REST_API_Auth_Database
             array('%d')
         );
     }
+
+    /**
+     * Generate API Key for user
+     */
+    public function generate_api_key($user_id)
+    {
+        global $wpdb;
+
+        $user = get_userdata($user_id);
+        if (!$user) {
+            return false;
+        }
+
+        // Generate unique API key
+        $api_key = 'pkl_' . wp_generate_password(32, false);
+
+        // Check if user already has an API key
+        $existing = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT id, revoked FROM {$this->table_name} WHERE user_login = %s",
+                $user->user_login
+            )
+        );
+
+        if ($existing) {
+            // Keep the previous revoked status when updating
+            $revoked_status = $existing->revoked;
+
+            // Update existing API key
+            $result = $wpdb->update(
+                $this->table_name,
+                array(
+                    'access_token' => $api_key,
+                    'revoked' => $revoked_status,
+                    'created_at' => current_time('mysql')
+                ),
+                array('user_login' => $user->user_login),
+                array('%s', '%d', '%s'),
+                array('%s')
+            );
+        } else {
+            // Insert new API key
+            $result = $wpdb->insert(
+                $this->table_name,
+                array(
+                    'user_login' => $user->user_login,
+                    'user_email' => $user->user_email,
+                    'access_token' => $api_key,
+                    'revoked' => 0,
+                    'created_at' => current_time('mysql')
+                ),
+                array('%s', '%s', '%s', '%d', '%s')
+            );
+        }
+
+        if ($result !== false) {
+            return $api_key;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get user's API key
+     */
+    public function get_user_api_key($user_id)
+    {
+        global $wpdb;
+
+        $user = get_userdata($user_id);
+        if (!$user) {
+            return false;
+        }
+
+        return $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT * FROM {$this->table_name} WHERE user_login = %s",
+                $user->user_login
+            ),
+            ARRAY_A
+        );
+    }
 }
