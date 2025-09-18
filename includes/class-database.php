@@ -34,17 +34,17 @@ class PKL_REST_API_Auth_Database
         $charset_collate = $wpdb->get_charset_collate();
 
         $sql = "CREATE TABLE {$this->table_name} (
-            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-            user_login varchar(60) NOT NULL,
-            user_email varchar(100) NOT NULL,
-            access_token varchar(255) NOT NULL,
-            revoked tinyint(1) NOT NULL DEFAULT 0,
-            created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id),
-            UNIQUE KEY user_login (user_login),
-            UNIQUE KEY access_token (access_token),
-            KEY user_email (user_email)
-        ) $charset_collate;";
+        id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+        user_login varchar(60) NOT NULL,
+        user_email varchar(100) NOT NULL,
+        access_token varchar(255) NOT NULL COLLATE utf8mb4_bin,
+        revoked tinyint(1) NOT NULL DEFAULT 0,
+        created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY user_login (user_login),
+        UNIQUE KEY access_token (access_token),
+        KEY user_email (user_email)
+    ) $charset_collate;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
@@ -117,7 +117,7 @@ class PKL_REST_API_Auth_Database
 
         return $wpdb->get_row(
             $wpdb->prepare(
-                "SELECT * FROM {$this->table_name} WHERE access_token = %s",
+                "SELECT * FROM {$this->table_name} WHERE access_token = %s COLLATE utf8mb4_bin",
                 $access_token
             ),
             ARRAY_A
