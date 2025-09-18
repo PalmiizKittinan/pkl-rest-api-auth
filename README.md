@@ -95,7 +95,7 @@ Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard
 
 1. 🔐 **Generate Access Token**
     - **Send a POST request to get an access token:**
-        - **POST** | *https://<your-wordpress-url>/wp-json/oauth/token*
+        - **POST** | https://<your-wordpress-url>/wp-json/oauth/token
       ```json
       {
         "email": "user@example.com"
@@ -121,7 +121,7 @@ Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard
 2. 🚀 **Use Access Token**
     - **Include the access token in your API requests using one of these methods:**
 
-    - **POST** | *https://<your-wordpress-url>/wp-json/wp/v2/posts*
+    - **POST** | https://<your-wordpress-url>/wp-json/wp/v2/posts
 
         - Method 1: Authorization Header (Recommended) 👍
           ```markdown
