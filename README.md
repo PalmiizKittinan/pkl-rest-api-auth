@@ -1,7 +1,9 @@
-# 🔐 PKL REST API Auth
+# 🔐 PKL REST API Auth For WordPress
 
 A lightweight WordPress plugin that controls access to the REST API by requiring user authentication.  
-This helps improve security by preventing unauthorized access to REST API endpoints for non-logged-in users.
+This helps improve security by preventing unauthorized access to REST API endpoints for non-logged-in or not registered users.
+#### 🌐 For WordPress REST API URL Endpoint
+> ./wp-json
 
 ---
 
@@ -11,11 +13,11 @@ This helps improve security by preventing unauthorized access to REST API endpoi
 - 🚫 Blocks unauthenticated requests with customizable settings.
 - ⚙️ Provides admin settings page to enable/disable authentication requirement.
 - 🌍 Multilingual support with WordPress text domain.
-- 🪶 Simple and lightweight, no external dependencies.
+- ✨ Simple and lightweight, no external dependencies.
 
 ---
 
-## 📋 WordPress Requirements
+## 📝 WordPress Requirements
 
 - **WordPress:** 5.0 or higher
 - **Tested up to:** 6.8
@@ -84,7 +86,7 @@ Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard
 
 ### 🌐 For Development API Platform
 
-#### 🛡️ Credential Method with Registered Email
+#### 🛡️ Credential Method with Registered Email (WordPress User Email)
 
 - **Method 1: Form-data (Recommended)**
   ```markdown
