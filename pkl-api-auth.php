@@ -3,7 +3,7 @@
  * Plugin Name: PKL REST API Auth
  * Plugin URI: https://github.com/PalmiizKittinan/pkl-rest-api-auth
  * Description: Control WordPress REST API access by requiring user authentication with OAuth token system.
- * Version: 2.0.0
+ * Version: 2.0.1
  * Author: Kittinan Lamkaek
  * Author URI: https://github.com/PalmiizKittinan
  * License: GPL v2 or later
