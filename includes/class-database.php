@@ -30,8 +30,10 @@ class PKL_REST_API_Auth_Database {
 
 		$charset_collate = $wpdb->get_charset_collate();
 
-		// Create table with direct SQL since it's for installation
-		$sql = "CREATE TABLE {$this->table_name} (
+		// Use esc_sql for table name to avoid interpolation warning
+		$table_name = esc_sql($this->table_name);
+
+		$sql = "CREATE TABLE {$table_name} (
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
             user_login varchar(60) NOT NULL,
             user_email varchar(100) NOT NULL,
@@ -62,10 +64,13 @@ class PKL_REST_API_Auth_Database {
 		// Generate unique API key
 		$api_key = 'pkl_' . wp_generate_password(32, false);
 
+		// Use esc_sql for table name
+		$table_name = esc_sql($this->table_name);
+
 		// Check if user already has an API key
 		$existing = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT id, revoked FROM {$this->table_name} WHERE user_login = %s",
+				"SELECT id, revoked FROM {$table_name} WHERE user_login = %s",
 				$user->user_login
 			)
 		);
@@ -124,9 +129,12 @@ class PKL_REST_API_Auth_Database {
 			return $cached_result;
 		}
 
+		// Use esc_sql for table name
+		$table_name = esc_sql($this->table_name);
+
 		$result = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$this->table_name} WHERE access_token = %s COLLATE utf8mb4_bin",
+				"SELECT * FROM {$table_name} WHERE access_token = %s COLLATE utf8mb4_bin",
 				$access_token
 			),
 			ARRAY_A
@@ -151,8 +159,11 @@ class PKL_REST_API_Auth_Database {
 			return $cached_result;
 		}
 
+		// Use esc_sql for table name
+		$table_name = esc_sql($this->table_name);
+
 		$result = $wpdb->get_results(
-			"SELECT * FROM {$this->table_name} ORDER BY created_at DESC",
+			"SELECT * FROM {$table_name} ORDER BY created_at DESC",
 			ARRAY_A
 		);
 
@@ -241,9 +252,12 @@ class PKL_REST_API_Auth_Database {
 			return $cached_result;
 		}
 
+		// Use esc_sql for table name
+		$table_name = esc_sql($this->table_name);
+
 		$result = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$this->table_name} WHERE user_login = %s",
+				"SELECT * FROM {$table_name} WHERE user_login = %s",
 				$user->user_login
 			),
 			ARRAY_A
