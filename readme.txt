@@ -9,7 +9,7 @@ Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Control WordPress REST API access by requiring user authentication. Disable API access for non-logged-in users with customizable settings.
+Control WordPress REST API access by requiring user authentication. Disable API access for non-logged-in or not registered users with customizable settings.
 
 == Description ==
 
