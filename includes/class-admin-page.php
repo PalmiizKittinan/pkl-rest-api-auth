@@ -161,38 +161,38 @@ class PKL_REST_API_Auth_Admin_Page
      */
     public function admin_page()
     {
-        // Verify nonce for tab parameter
-        $active_tab = 'settings';
-        if (isset($_GET['tab']) && wp_verify_nonce(wp_create_nonce('pkl_admin_tab'), 'pkl_admin_tab')) {
-            $active_tab = sanitize_text_field(wp_unslash($_GET['tab']));
-        } elseif (isset($_GET['tab'])) {
-            $active_tab = sanitize_text_field(wp_unslash($_GET['tab']));
-        }
+	    // Verify nonce for tab parameter
+	    $active_tab = 'settings';
+	    if (isset($_GET['tab']) && wp_verify_nonce(wp_create_nonce('pkl_admin_tab'), 'pkl_admin_tab')) {
+		    $active_tab = sanitize_text_field(wp_unslash($_GET['tab']));
+	    } elseif (isset($_GET['tab'])) {
+		    $active_tab = sanitize_text_field(wp_unslash($_GET['tab']));
+	    }
 
-        $tokens = $this->database->get_all_tokens();
+	    $tokens = $this->database->get_all_tokens();
 
-        // Show messages
-        if (isset($_GET['message'])) {
-            $message = sanitize_text_field(wp_unslash($_GET['message']));
-            $class = 'notice-success';
-            $text = '';
+	    // Show messages
+	    if (isset($_GET['message'])) {
+		    $message = sanitize_text_field(wp_unslash($_GET['message']));
+		    $class = 'notice-success';
+		    $text = '';
 
-            switch ($message) {
-                case 'revoked':
-                    $text = esc_html__('Token revoked successfully.', 'pkl-rest-api-auth');
-                    break;
-                case 'restored':
-                    $text = esc_html__('Token restored successfully.', 'pkl-rest-api-auth');
-                    break;
-                case 'deleted':
-                    $text = esc_html__('Token deleted successfully.', 'pkl-rest-api-auth');
-                    break;
-            }
+		    switch ($message) {
+			    case 'revoked':
+				    $text = __('Token revoked successfully.', 'pkl-rest-api-auth');
+				    break;
+			    case 'restored':
+				    $text = __('Token restored successfully.', 'pkl-rest-api-auth');
+				    break;
+			    case 'deleted':
+				    $text = __('Token deleted successfully.', 'pkl-rest-api-auth');
+				    break;
+		    }
 
-            if ($text) {
-                echo '<div class="notice ' . esc_attr($class) . ' is-dismissible"><p>' . $text . '</p></div>';
-            }
-        }
+		    if ($text) {
+			    echo '<div class="notice ' . esc_attr($class) . ' is-dismissible"><p>' . esc_html($text) . '</p></div>';
+		    }
+	    }
         ?>
         <div class="wrap">
             <h1><?php esc_html_e('PKL REST API Auth', 'pkl-rest-api-auth'); ?></h1>
