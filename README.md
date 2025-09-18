@@ -9,7 +9,7 @@ This helps improve security by preventing unauthorized access to REST API endpoi
 
 ## ✨ Features
 
-- 🔒 Restricts REST API access to logged-in users only.
+- 🔒 Restricts REST API access to logged-in or registered users only.
 - 🚫 Blocks unauthenticated requests with customizable settings.
 - ⚙️ Provides admin settings page to enable/disable authentication requirement.
 - 🌍 Multilingual support with WordPress text domain.
