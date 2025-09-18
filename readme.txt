@@ -67,3 +67,11 @@ Initial release of PKL REST API Auth plugin.
   * Method 1: Form-data (Recommended for Postman)
   * Method 2: Header
   * Method 3: Query Parameter
+
+= 2.0.0 =
+* Add Oauth AccessToken For Credential
+* Credential With Email Address No-Longer Support
+
+= 2.0.1 =
+* Bug Fixed
+  * User utf8mb4_bin Schema For Plugin Table

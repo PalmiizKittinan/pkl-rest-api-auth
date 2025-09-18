@@ -1,0 +1,75 @@
+/* PKL REST API Auth Admin Styles */
+.pkl-guide-section {
+    max-width: 900px;
+}
+
+.pkl-guide-box {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-left: 4px solid #0073aa;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.pkl-guide-box h3 {
+    margin-top: 0;
+    color: #0073aa;
+}
+
+.pkl-code-block {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    padding: 15px;
+    margin: 10px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.pkl-code-block pre {
+    margin: 0;
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+}
+
+.pkl-tokens-section .wp-list-table {
+    margin-top: 20px;
+}
+
+.pkl-token-revoked {
+    background-color: #ffebee !important;
+}
+
+.pkl-token-active {
+    background-color: #e8f5e8 !important;
+}
+
+.pkl-status-active {
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+.pkl-status-revoked {
+    color: #c62828;
+    font-weight: bold;
+}
+
+.pkl-actions form {
+    margin-right: 5px;
+}
+
+.nav-tab .count {
+    background: #0073aa;
+    color: white;
+    border-radius: 10px;
+    padding: 2px 6px;
+    font-size: 11px;
+    margin-left: 5px;
+}
+
+.tab-content {
+    margin-top: 20px;
+}
