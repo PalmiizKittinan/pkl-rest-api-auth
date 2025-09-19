@@ -98,7 +98,7 @@ Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard
 
 2. 🚀 **Use API Key**
    - **Include your API Key requests using one of these methods:**
-### 🎯 **Example** :  POST | https://`<your-wordpress-url>`/wp-json/wp/v2/posts
+#### Example : POST | https://`<your-wordpress-url>`/wp-json/wp/v2/posts
 
 - Method 1: Authorization Header API Key (Recommended) 👍
     ```text
@@ -120,14 +120,25 @@ Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard
   ?api_key=<your_api_key>
   ```
 
-  ### Example : Input of Data Body JSON
-  ```json
-  {
-    "title":"Lorem Ipsum",
-    "content":"Maecenas sagittis convallis volutpat.", 
-    "status":"draft"
-  }
-  ```
+### 🎯 Example : Input of Data Body JSON
+Authorization :
+```text
+Auth Type : API Key
+Key : X-API-Key
+Value <your_api_key>
+```
+Header
+```text
+Content-Type : application/json
+```
+JSON Body :
+```json
+{
+  "title":"Lorem Ipsum",
+  "content":"Maecenas sagittis convallis volutpat.", 
+  "status":"draft"
+}
+ ```
 
 ---
 
