@@ -71,7 +71,7 @@ This helps improve security by preventing unauthorized access to REST API endpoi
 Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard:
 
 - **Enable REST API Authentication**
-    - ✅ Checked: Only logged-in users can access the REST API.
+    - ✅ Checked: Require authentication for REST API access
     - ⬜ Unchecked: REST API remains open as usual.
 
 ---
