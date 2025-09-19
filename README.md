@@ -120,7 +120,7 @@ Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard
   ?api_key=<your_api_key>
   ```
 
-  ### Example Input Data (Raw JSON)
+  ### Example : Input of Data Body JSON
   ```json
   {
     "title":"Lorem Ipsum",
