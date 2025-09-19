@@ -68,7 +68,7 @@ Go to **Settings → PKL REST API Auth** to:
 #### ✅ Method 1: Authorization Bearer (Recommended for Production)
 ```text
 GET /wp-json/wp/v2/posts
-Authorization: Bearer pkl_abcd1234...
+Authorization:Bearer pkl_abcd1234...
 ```
 
 #### 🚀 Method 2: Form-data (Recommended for Testing)
@@ -76,7 +76,7 @@ Authorization: Bearer pkl_abcd1234...
 POST /wp-json/wp/v2/posts
 Content-Type: multipart/form-data
 
-access_token: pkl_abcd1234...
+api_key: pkl_abcd1234...
 title: Test Post
 content: Post content here
 status: draft
@@ -90,7 +90,7 @@ X-API-Key: pkl_abcd1234...
 
 #### 🚨 Method 4: Query Parameter (Development Only)
 ```text
-GET /wp-json/wp/v2/posts?access_token=pkl_abcd1234...
+GET /wp-json/wp/v2/posts?api_key=pkl_abcd1234...
 ```
 
 # 🌐 API Reference
