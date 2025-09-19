@@ -135,26 +135,39 @@ class PKL_REST_API_Auth {
     private function check_api_key_auth() {
         $api_key = '';
 
-        // Check in form-data
+        // Method 1: Check in form-data
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- This is for API authentication, not form processing
         if (isset($_POST['api_key']) && !empty($_POST['api_key'])) {
             // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.NonceVerification.Missing
             $api_key = sanitize_text_field(wp_unslash($_POST['api_key']));
         }
 
-        // Check in headers
+        // Method 2 & 4: Check in headers (X-API-Key and Authorization Bearer)
         if (empty($api_key)) {
             $headers = getallheaders();
             if (is_array($headers)) {
+                // Method 2: X-API-Key header
                 if (isset($headers['X-API-Key'])) {
                     $api_key = sanitize_text_field($headers['X-API-Key']);
                 } elseif (isset($headers['x-api-key'])) {
                     $api_key = sanitize_text_field($headers['x-api-key']);
                 }
+                // Method 4: Authorization Bearer header
+                elseif (isset($headers['Authorization'])) {
+                    $auth_header = $headers['Authorization'];
+                    if (strpos($auth_header, 'Bearer ') === 0) {
+                        $api_key = sanitize_text_field(substr($auth_header, 7)); // Remove "Bearer " prefix
+                    }
+                } elseif (isset($headers['authorization'])) {
+                    $auth_header = $headers['authorization'];
+                    if (strpos($auth_header, 'Bearer ') === 0) {
+                        $api_key = sanitize_text_field(substr($auth_header, 7)); // Remove "Bearer " prefix
+                    }
+                }
             }
         }
 
-        // Check in query parameters
+        // Method 3: Check in query parameters
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This is for API authentication, not form processing
         if (empty($api_key) && isset($_GET['api_key'])) {
             // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.NonceVerification.Recommended

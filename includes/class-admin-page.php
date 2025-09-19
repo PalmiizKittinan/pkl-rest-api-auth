@@ -341,8 +341,7 @@ class PKL_REST_API_Auth_Admin_Page
     /**
      * Render guide tab
      */
-    private function render_guide_tab()
-    {
+    private function render_guide_tab() {
         ?>
         <div class="pkl-guide-section">
             <h2><?php esc_html_e('API Usage Guide', 'pkl-rest-api-auth'); ?></h2>
@@ -367,15 +366,13 @@ class PKL_REST_API_Auth_Admin_Page
                     <strong>POST</strong> <?php echo esc_html(get_site_url()); ?>/wp-json/wp/v2/posts
                     <br><br>
                     <strong><?php esc_html_e('Form-data:', 'pkl-rest-api-auth'); ?></strong>
-                    <pre>
-                        api_key: pkl_abcd1234...
-                        title: Test Post
-                        content: Post content here
-                        status: draft
-                    </pre>
+                    <pre>api_key: pkl_abcd1234...
+title: Test Post
+content: Post content here
+status: draft</pre>
                 </div>
 
-                <h4><?php esc_html_e('Method 2: Header API Key (Recommended)', 'pkl-rest-api-auth'); ?></h4>
+                <h4><?php esc_html_e('Method 2: Header X-API-Key', 'pkl-rest-api-auth'); ?></h4>
                 <div class="pkl-code-block">
                     <strong><?php esc_html_e('Headers:', 'pkl-rest-api-auth'); ?></strong>
                     <pre>X-API-Key: pkl_abcd1234...</pre>
@@ -385,14 +382,51 @@ class PKL_REST_API_Auth_Admin_Page
                 <div class="pkl-code-block">
                     <strong>GET</strong> <?php echo esc_html(get_site_url()); ?>/wp-json/wp/v2/posts?api_key=pkl_abcd1234...
                 </div>
+
+                <h4><?php esc_html_e('Method 4: Authorization Bearer Token (Recommended)', 'pkl-rest-api-auth'); ?></h4>
+                <div class="pkl-code-block">
+                    <strong><?php esc_html_e('Headers:', 'pkl-rest-api-auth'); ?></strong>
+                    <pre>Authorization: Bearer pkl_abcd1234...</pre>
+                </div>
+            </div>
+
+            <div class="pkl-guide-box">
+                <h3><?php esc_html_e('📝 Example API Calls', 'pkl-rest-api-auth'); ?></h3>
+
+                <h4><?php esc_html_e('Get Posts with Bearer Token:', 'pkl-rest-api-auth'); ?></h4>
+                <div class="pkl-code-block">
+                    <strong>GET</strong> <?php echo esc_html(get_site_url()); ?>/wp-json/wp/v2/posts
+                    <br>
+                    <strong><?php esc_html_e('Headers:', 'pkl-rest-api-auth'); ?></strong> Authorization: Bearer pkl_abcd1234...
+                </div>
+
+                <h4><?php esc_html_e('Create Post with Bearer Token:', 'pkl-rest-api-auth'); ?></h4>
+                <div class="pkl-code-block">
+                    <strong>POST</strong> <?php echo esc_html(get_site_url()); ?>/wp-json/wp/v2/posts
+                    <br>
+                    <strong><?php esc_html_e('Headers:', 'pkl-rest-api-auth'); ?></strong>
+                    <pre>
+                        Authorization: Bearer pkl_abcd1234...
+                        Content-Type: application/json
+                    </pre>
+                    <strong><?php esc_html_e('Body (JSON):', 'pkl-rest-api-auth'); ?></strong>
+                    <pre>
+                        {
+                          "title": "My New Post",
+                          "content": "This is the post content",
+                          "status": "draft"
+                        }
+                    </pre>
+                </div>
             </div>
 
             <div class="notice notice-info inline">
                 <p><strong><?php esc_html_e('Security Note:', 'pkl-rest-api-auth'); ?></strong></p>
                 <ul>
-                    <li><?php esc_html_e('API keys are unique to each user and cannot be guessed', 'pkl-rest-api-auth'); ?></li>
-                    <li><?php esc_html_e('Only you can generate your API key through your profile page', 'pkl-rest-api-auth'); ?></li>
-                    <li><?php esc_html_e('Admin can revoke API keys if needed', 'pkl-rest-api-auth'); ?></li>
+                    <li><?php esc_html_e('🥇 Authorization Bearer Token (Most Secure & Standard)', 'pkl-rest-api-auth'); ?></li>
+                    <li><?php esc_html_e('🥈 X-API-Key Header (Secure)', 'pkl-rest-api-auth'); ?></li>
+                    <li><?php esc_html_e('🥉 Form-data (Good for testing)', 'pkl-rest-api-auth'); ?></li>
+                    <li><?php esc_html_e('🚫 Query Parameter (Development only - not recommended for production)', 'pkl-rest-api-auth'); ?></li>
                     <li><?php esc_html_e('Keep your API key secure and do not share it', 'pkl-rest-api-auth'); ?></li>
                 </ul>
             </div>
