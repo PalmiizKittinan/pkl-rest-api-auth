@@ -17,7 +17,6 @@ PKL REST API Auth provides secure authentication for WordPress REST API endpoint
 - 📊 **Admin Dashboard** - View all active and revoked tokens
 - 🚀 **RESTful API** - Generate tokens via REST endpoint
 - 🔧 **Easy Integration** - Works with existing WordPress REST API
-- 📱 **Mobile-Friendly** - 
 
 ## 📝 Requirements
 
