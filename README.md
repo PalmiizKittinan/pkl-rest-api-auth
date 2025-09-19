@@ -127,7 +127,7 @@ Auth Type : API Key
 Key : X-API-Key
 Value <your_api_key>
 ```
-Header
+Header :
 ```text
 Content-Type : application/json
 ```
