@@ -63,7 +63,7 @@ class PKL_REST_API_Auth_Database {
 		}
 
 		// Generate unique API key
-		$api_key = 'pkl_' . wp_generate_password(32, false);
+		$api_key = 'pkl_' . wp_generate_password(40, false);
 
 		// Use esc_sql for table name
 		$table_name = esc_sql($this->table_name);
