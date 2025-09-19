@@ -1,24 +1,24 @@
 # 🔐 PKL REST API Auth For WordPress
 
-A lightweight WordPress plugin that controls access to the REST API by requiring user authentication.  
-This helps improve security by preventing unauthorized access to REST API endpoints for non-logged-in or not registered users.
+A lightweight WordPress plugin that restricts access to the REST API by requiring user authentication.  
+It enhances security by preventing unauthorized access to REST API endpoints for users who are not logged in or not registered.
 
-#### 🌐 For WordPress REST API URL Endpoint
-> https://`<your-wordpress-url>`/wp-json/<WP_REST_API_ENDPOINT>
+#### 🌐 WordPress REST API URL Endpoint
+`https://<your-wordpress-url>/wp-json/wp/v2/<wp-api-endpoint>`
 
 ---
 
 ## ✨ Features
 
-- 🔒 Restricts REST API access to logged-in or registered users only.
-- 🚫 Blocks unauthenticated requests with customizable settings.
-- ⚙️ Provides admin settings page to enable/disable authentication requirement.
-- 🌍 Multilingual support with WordPress text domain.
-- ✨ Simple and lightweight, no external dependencies.
+- 🔒 Restricts REST API access to authenticated (logged-in) or registered users only.
+- 🚫 Blocks unauthenticated requests with customizable options.
+- ⚙️ Provides an admin settings page to enable or disable authentication requirements.
+- 🌍 Multilingual support using WordPress text domains.
+- ✨ Lightweight and simple, with no external dependencies.
 
 ---
 
-## 📝 WordPress Requirements
+## 📝 Requirements
 
 - **WordPress:** 5.0 or higher
 - **Tested up to:** 6.8
@@ -33,14 +33,14 @@ This helps improve security by preventing unauthorized access to REST API endpoi
    git clone https://github.com/PalmiizKittinan/pkl-rest-api-auth.git
    ```
 2. Activate the plugin via the **WordPress Admin Dashboard** → **Plugins**.
-3. Go to **Settings** → **PKL REST API Auth** to configure authentication settings.
+3. Go to **Settings** → **PKL REST API Auth** to configure authentication options.
 
 ---
 
 ## 🚀 Usage
 
-- When enabled, the plugin blocks unauthenticated access to the WordPress REST API.
-- If a non-logged-in user tries to access the API, they will receive a `401 Unauthorized` error:
+- When enabled, the plugin blocks all unauthenticated access to the WordPress REST API.
+- If a non-logged-in user tries to access the API, they will receive a `401 Unauthorized` response:
 
 ```json
 {
@@ -52,7 +52,7 @@ This helps improve security by preventing unauthorized access to REST API endpoi
 }
 ```
 
-- If a logged-in user does not have sufficient permissions, they will receive a `403 Forbidden` error:
+- If a logged-in user does not have sufficient permissions, they will receive a `403 Forbidden` response:
 
 ```json
 {
@@ -71,72 +71,78 @@ This helps improve security by preventing unauthorized access to REST API endpoi
 Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard:
 
 - **Enable REST API Authentication**
-    - ✅ Checked: Require authentication for REST API access
-    - ⬜ Unchecked: REST API remains open as usual.
+    - ✅ Checked: Authentication is required for REST API access.
+    - ⬜ Unchecked: REST API remains open without restrictions.
 
 ---
 
 ## 🛠️ Development
 
-- Clone the repo:
+- Clone the repository:
   ```bash
   git clone https://github.com/PalmiizKittinan/pkl-rest-api-auth.git
   ```
-- Make your changes.
-- Submit a pull request for contributions.
+- Make your modifications.
+- Submit a pull request to contribute.
 
 ---
 
-## 🌐 For Development API Platform
+## 🌐 API Key Authentication (For Developers)
 
-> Using `<your_api_key>` for All API Endpoint Authentication
+> Use `<your_api_key>` for authenticating all API requests.
 
 ### 📖 API Usage Guide
 
 1. 🔐 **Generate API Key**
-   - Generate your API Key in `Users > Profile > REST API Access`
+    - Create an API key under `Users > Profile > REST API Access`.
 
 2. 🚀 **Use API Key**
-   - **Include your API Key requests using one of these methods:**
-#### Example : POST | https://`<your-wordpress-url>`/wp-json/wp/v2/posts
+    - **You can include your API key in requests using one of the following methods:**
 
-- Method 1: Header API Key
-    ```text 
-    X-API-Key: <your_api_key>
-    ```
-- Method 2: Form-data
-  ```text 
+- Method 1: **Bearer Token (Recommended)** 👍
+  ```text
+  Authorization: Bearer <your_api_key>
+  ```
+
+- Method 2: **Header API Key**
+  ```text
+  X-API-Key: <your_api_key>
+  ```
+
+- Method 3: **Form-data**
+  ```text
   api_key: <your_api_key>
   title: Test Post
   content: Post content here
   status: publish | draft | pending | private | future
   ```
-- Method 3: Query Parameter
+
+- Method 4: **Query Parameter**
   ```text
   ?api_key=<your_api_key>
   ```
-- Method 4: Bearer Token (Recommended) 👍
-  ```text
-  Authorization: Bearer <your_api_key>
-  ```
 
-### 🎯 Example : Input of Data Body JSON
-Authorization :
+### 🎯 Example: JSON Request Body
+#### Method: POST | `https://<your-wordpress-url>/wp-json/wp/v2/posts`
+
+Authorization Header:
 ```text
 Authorization: Bearer <your_api_key>
 ```
-Header :
+
+Request Header:
 ```text
-Content-Type : application/json
+Content-Type: application/json
 ```
-JSON Body :
+
+JSON Body:
 ```json
 {
-  "title":"Lorem Ipsum",
-  "content":"Maecenas sagittis convallis volutpat.", 
-  "status":"draft"
+  "title": "Lorem Ipsum",
+  "content": "Maecenas sagittis convallis volutpat.",
+  "status": "draft"
 }
- ```
+```
 
 ---
 
@@ -149,4 +155,4 @@ JSON Body :
 ## 📄 License
 
 This plugin is licensed under the [GPL v2 or later](https://www.gnu.org/licenses/gpl-2.0.html).  
-You are free to modify and redistribute under the same license.
+You are free to modify and redistribute it under the same license.
