@@ -1,97 +1,102 @@
-# 🔐 PKL REST API Auth For WordPress
+# 🔐 PKL REST API Auth
 
-A lightweight WordPress plugin that restricts access to the REST API by requiring user authentication.  
-It enhances security by preventing unauthorized access to REST API endpoints for users who are not logged in or not registered.
-
-#### 🌐 WordPress REST API URL Endpoint
-`https://<your-wordpress-url>/wp-json/wp/v2/<api-endpoint>`
+A WordPress plugin that controls REST API access by requiring user authentication with OAuth token system.
 
 ---
+
+## 📝 Description
+
+PKL REST API Auth provides secure authentication for WordPress REST API endpoints using access tokens. Only registered users can generate tokens and access the API, giving you complete control over who can interact with your WordPress site programmatically.
 
 ## ✨ Features
 
-- 🔒 Restricts REST API access to authenticated (logged-in) or registered users only.
-- 🚫 Blocks unauthenticated requests with customizable options.
-- ⚙️ Provides an admin settings page to enable or disable authentication requirements.
-- 🌍 Multilingual support using WordPress text domains.
-- ✨ Lightweight and simple, with no external dependencies.
-
----
+- 🔒 **Secure Token-based Authentication** - OAuth-style access tokens
+- 🛡️ **Multiple Authentication Methods** - Form-data, Headers, Bearer Token, Query Parameters
+- 👥 **User Management** - Admin interface to manage all access tokens
+- 🔄 **Token Management** - Revoke, restore, or delete tokens
+- 📊 **Admin Dashboard** - View all active and revoked tokens
+- 🚀 **RESTful API** - Generate tokens via REST endpoint
+- 🔧 **Easy Integration** - Works with existing WordPress REST API
+- 📱 **Mobile-Friendly** - 
 
 ## 📝 Requirements
 
-- **WordPress:** 5.0 or higher
-- **Tested up to:** 6.8
-- **PHP:** 7.4 or higher
+- WordPress 5.0 or higher
+- PHP 7.4 or higher
+- Users must be registered in WordPress
+
+## 🚀 Installation
+
+1. Download the plugin files
+2. Upload to `/wp-content/plugins/pkl-rest-api-auth/` directory
+3. Activate the plugin through WordPress admin
+4. Configure settings in **Settings → PKL REST API Auth**
+
+## 🛠️ Configuration
+
+### Plugin Settings
+Go to **Settings → PKL REST API Auth** to:
+- Enable/disable REST API authentication
+- View API usage guide
+- Manage access tokens
+
+## 📊 Admin Interface
+
+**The plugin provides three main tabs**
+1. **Settings** - Configure authentication requirements
+   - Enable/Disable REST API Authentication
+2. **Access Tokens** - Manage all user tokens
+   - View all generated tokens
+   - Revoke tokens (disable access)
+   - Restore revoked tokens
+   - Delete tokens permanently
+3. **API Guide** - Complete usage documentation
 
 ---
 
-## 📥 Installation
+# 🎯 REST API Quick Start Guide
+## 📋 Authentication Method Comparison
 
-1. Download or clone this repository into your WordPress `wp-content/plugins/` directory:
-   ```bash
-   git clone https://github.com/PalmiizKittinan/pkl-rest-api-auth.git
-   ```
-2. Activate the plugin via the **WordPress Admin Dashboard** → **Plugins**.
-3. Go to **Settings** → **PKL REST API Auth** to configure authentication options.
+| Method | Security | Use Case | Pros | Cons |
+|--------|--------|----------|------|------|
+| **Bearer Token** | Highest | Production | HTTP Standard, Secure | May be logged |
+| **Custom Header** | High | Internal APIs | Explicit, Clear | Non-standard |
+| **Form-data** | Good | Testing/Files | Easy testing | Not standard |
+| **Query Parameter** | 🚫 Low | Development | Simple | Security risk |
 
----
-
-## 🚀 Usage
-
-- When enabled, the plugin blocks all unauthenticated access to the WordPress REST API.
-- If a non-logged-in user tries to access the API, they will receive a `401 Unauthorized` response:
-
-```json
-{
-  "code": "rest_not_logged_in",
-  "message": "You are not currently logged in.",
-  "data": {
-    "status": 401
-  }
-}
+### Example
+#### ✅ Method 1: Authorization Bearer (Recommended for Production)
+```text
+GET /wp-json/wp/v2/posts
+Authorization: Bearer pkl_abcd1234...
 ```
 
-- If a logged-in user does not have sufficient permissions, they will receive a `403 Forbidden` response:
+#### 🚀 Method 2: Form-data (Recommended for Testing)
+```text
+POST /wp-json/wp/v2/posts
+Content-Type: multipart/form-data
 
-```json
-{
-  "code": "rest_insufficient_permissions",
-  "message": "You do not have sufficient permissions to access this API.",
-  "data": {
-    "status": 403
-  }
-}
+access_token: pkl_abcd1234...
+title: Test Post
+content: Post content here
+status: draft
 ```
 
----
+#### Method 3: Custom Header
+```text
+GET /wp-json/wp/v2/posts
+X-API-Key: pkl_abcd1234...
+```
 
-## ⚙️ Settings
+#### 🚨 Method 4: Query Parameter (Development Only)
+```text
+GET /wp-json/wp/v2/posts?access_token=pkl_abcd1234...
+```
 
-Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard:
-
-- **Enable REST API Authentication**
-    - ✅ Checked: Authentication is required for REST API access.
-    - ⬜ Unchecked: REST API remains open without restrictions.
-
----
-
-## 🛠️ Development
-
-- Clone the repository:
-  ```bash
-  git clone https://github.com/PalmiizKittinan/pkl-rest-api-auth.git
-  ```
-- Make your modifications.
-- Submit a pull request to contribute.
-
----
-
-## 🌐 API Key Authentication (For Developers)
-
+# 🌐 API Reference
 > Use `<your_api_key>` for authenticating all API requests.
 
-### 📖 API Usage Guide
+## 📖 API Usage Guide
 
 1. 🔐 **Generate API Key**
     - Create an API key under `Users > Profile > REST API Access`.
@@ -99,7 +104,7 @@ Navigate to **Settings → PKL REST API Auth** in your WordPress admin dashboard
 2. 🚀 **Use API Key**
     - **You can include your API key in requests using one of the following methods:**
 
-- Method 1: **Bearer Token (Recommended)** 👍
+- Method 1: **Bearer Token (Recommended)**
   ```text
   Authorization: Bearer <your_api_key>
   ```
@@ -146,11 +151,10 @@ JSON Body:
 
 ---
 
-## 👤 Author
+## 👨‍💻 Author
+- GitHub: [@PalmiizKittinan](https://github.com/PalmiizKittinan)
+- Plugin URI: [https://github.com/PalmiizKittinan/pkl-rest-api-auth](https://github.com/PalmiizKittinan/pkl-rest-api-auth)
 
-- **Author:** [Kittinan Lamkaek](https://github.com/PalmiizKittinan)
-
----
 
 ## 📄 License
 
