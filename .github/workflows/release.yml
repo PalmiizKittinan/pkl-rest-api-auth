@@ -1,0 +1,34 @@
+name: Update Plugin Version on Tag
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Tag Version
+        id: get_version
+        run: |
+          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          echo "TAG_VERSION=$TAG_VERSION" >> $GITHUB_ENV
+
+      - name: Update Version in PHP File
+        run: |
+          sed -i "s/\* Version: [0-9]\+\.[0-9]\+\.[0-9]\+/\* Version: $TAG_VERSION/" pkl-rest-api-auth.php
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add pkl-rest-api-auth.php
+          git commit -m "chore: update plugin version to $TAG_VERSION"
+          git push origin main

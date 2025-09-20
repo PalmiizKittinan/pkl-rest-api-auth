@@ -56,12 +56,12 @@ Go to **Settings → PKL REST API Auth** to:
 # 🎯 REST API Quick Start Guide
 ## 📋 Authentication Method Comparison
 
-| Method | Security | Use Case | Pros | Cons |
-|--------|--------|----------|------|------|
-| **Bearer Token** | Highest | Production | HTTP Standard, Secure | May be logged |
-| **Custom Header** | High | Internal APIs | Explicit, Clear | Non-standard |
-| **Form-data** | Good | Testing/Files | Easy testing | Not standard |
-| **Query Parameter** | 🚫 Low | Development | Simple | Security risk |
+| Method              | Security | Use Case      | Pros                  | Cons          |
+|---------------------|----------|---------------|-----------------------|---------------|
+| **Bearer Token**    | Highest  | Production    | HTTP Standard, Secure | May be logged |
+| **Custom Header**   | High     | Internal APIs | Explicit, Clear       | Non-standard  |
+| **Form-data**       | Good     | Testing/Files | Easy testing          | Not standard  |
+| **Query Parameter** | 🚫 Low   | Development   | Simple                | Security risk |
 
 ### Example
 #### ✅ Method 1: Authorization Bearer (Recommended for Production)
