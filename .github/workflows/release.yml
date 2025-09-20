@@ -39,6 +39,7 @@ jobs:
       - name: Update Version in PHP File
         run: |
           sed -i "s/\(\* Version: \).*/\1${{ env.TAG_VERSION }}/" pkl-api-auth.php
+          sed -i "s/\(\*Stable tag: \).*/\1${{ env.TAG_VERSION }}/" readme.txt
 
       - name: Commit and Push Version Change
         run: |
