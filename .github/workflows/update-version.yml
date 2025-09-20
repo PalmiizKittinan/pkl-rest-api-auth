@@ -30,8 +30,8 @@ jobs:
 
       - name: Sync with remote and commit
         run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add pkl-api-auth.php
           git commit -m "temp: update version for ${{ env.TAG_VERSION }}"
           git config --global pull.rebase true
