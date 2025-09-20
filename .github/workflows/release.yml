@@ -43,8 +43,8 @@ jobs:
       - name: Commit and Push Version Change
         run: |
           git add pkl-api-auth.php
-          git commit -m "chore: update plugin version to ${{ env.TAG_VERSION }}"
-          git push origin main --force-with-lease
+          git commit -m "chore: update plugin version to ${{ env.TAG_VERSION }}" || echo "No changes to commit"
+          git push origin main --force-with-lease || echo "Nothing to push"
 
       - name: Create Clean Zip
         run: |
