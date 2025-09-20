@@ -165,7 +165,7 @@
     box-shadow: 0 1px 1px rgba(0,0,0,0.04);
 }
 .notice.notice-info.inline:before {
-    font-family: dashicons;
+    font-family: dashicons, serif;
     content: "\f348"; /* Dashed icon for info */
     position: absolute;
     left: 15px;
