@@ -36,16 +36,38 @@ jobs:
           git pull origin main --rebase --allow-unrelated-histories
           git status
 
-      - name: Update Version in PHP File
+      - name: Update Version in PHP File (Stable Only)
         run: |
-          sed -i "s/\(\* Version: \).*/\1${{ env.TAG_VERSION }}/" pkl-api-auth.php
-          sed -i "s/\(\*Stable tag: \).*/\1${{ env.TAG_VERSION }}/" readme.txt
+          echo "Current TAG_VERSION: ${{ env.TAG_VERSION }}"
+          
+          if [[ "${{ env.TAG_VERSION }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "This is a stable release. Updating version files..."
+          
+            sed -i "s/\(\* Version: \).*/\1${{ env.TAG_VERSION }}/" pkl-api-auth.php
+          
+            if grep -q "Stable tag:" readme.txt; then
+              sed -i "s/\(Stable tag: \).*/\1${{ env.TAG_VERSION }}/" readme.txt
+              echo "Updated Stable tag in readme.txt"
+            else
+              echo "Warning: Stable tag not found in readme.txt"
+            fi
+          
+            git add pkl-api-auth.php readme.txt
+            git commit -m "chore: update plugin version to ${{ env.TAG_VERSION }}"
+            git push origin main --force-with-lease
+          else
+            echo "This is a pre-release (${{ env.TAG_VERSION }}). Skipping version file updates."
+          fi
 
       - name: Commit and Push Version Change
         run: |
           git add pkl-api-auth.php
           git commit -m "chore: update plugin version to ${{ env.TAG_VERSION }}" || echo "No changes to commit"
           git push origin main --force-with-lease || echo "Nothing to push"
+
+      - name: Pull Latest Changes
+        run: |
+          git pull origin main --rebase
 
       - name: Create Clean Zip
         run: |
