@@ -30,8 +30,8 @@ jobs:
 
       - name: Sync with remote and commit
         run: |
-          git config --global pull.rebase true
           git add pkl-api-auth.php
-          git pull origin main --rebase
-          git commit -m "chore: update version to ${{ env.TAG_VERSION }}"
+          git commit -m "temp: update version for ${{ env.TAG_VERSION }}"  # 📝 Commit ชั่วคราว
+          git config --global pull.rebase true
+          git pull origin main --rebase  # นำ Commit นี้ไป Rebase กับ Remote
           git push origin main
