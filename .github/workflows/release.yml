@@ -58,9 +58,10 @@ jobs:
           
           find . -type f \( -iname "README.md" -o -iname "readme.md" -o -iname "license.md" -o -iname "changelog.md" -o -iname "LICENSE" -o -iname "*.md" \) -delete
           
+          rm -R clean-plugin
+          
           ls -la
           
-          # สร้าง ZIP
           zip -r ../${{ github.event.repository.name }}.zip .
           
           cd ..
