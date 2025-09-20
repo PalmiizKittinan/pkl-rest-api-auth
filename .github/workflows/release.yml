@@ -31,11 +31,10 @@ jobs:
 
       - name: Sync with Main Branch
         run: |
-          # แก้ปัญหา Detached HEAD: Fetch และ Checkout main แท้จริง
           git fetch origin
           git checkout main
-          git pull origin main --rebase --allow-unrelated-histories  # ปลอดภัยถ้ามี conflict เล็กน้อย
-          git status  # ตรวจสอบสภาพ
+          git pull origin main --rebase --allow-unrelated-histories
+          git status
 
       - name: Update Version in PHP File
         run: |
@@ -45,16 +44,22 @@ jobs:
         run: |
           git add pkl-api-auth.php
           git commit -m "chore: update plugin version to ${{ env.TAG_VERSION }}"
-          # ใช้ force-with-lease เพื่อ push ปลอดภัย
           git push origin main --force-with-lease
 
       - name: Create Clean Zip
         run: |
+          mkdir -p clean-plugin
+          
+          cp -r * clean-plugin/ 2>/dev/null || true
+          cd clean-plugin
+          
           rm -rf .git .github .idea .vscode node_modules tests
-          rm -f .gitignore .gitattributes .distignore composer.lock package-lock.json yarn.lock
+          rm -f .gitignore .gitattributes .distignore composer.lock package*.json yarn.lock
           rm -f README.md *.md
           
-          git archive --format=zip --output=${{ github.event.repository.name }}.zip HEAD
+          zip -r ../${{ github.event.repository.name }}.zip .
+          
+          cd ..
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
