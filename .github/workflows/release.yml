@@ -1,21 +1,22 @@
-name: Update Plugin Version on Tag
+name: Update Version and Create Release
 
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*' # ทำงานเมื่อมีการสร้าง Tag ที่ขึ้นต้นด้วย v
 
 jobs:
-  update-version:
+  build-and-release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # จำเป็นสำหรับการ commit และสร้าง release
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
+          # fetch-depth: 0 จำเป็นเพื่อให้สามารถดึง Tag ก่อนหน้ามาสร้าง Changelog ได้
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Git and Checkout Main
         run: |
@@ -25,16 +26,34 @@ jobs:
           git checkout main
 
       - name: Extract Tag Version
+        id: get_version # ตั้ง id ให้ step นี้เพื่ออ้างอิง version ได้
         run: |
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
           echo "TAG_VERSION=$TAG_VERSION" >> $GITHUB_ENV
+          echo "version=$TAG_VERSION" >> $GITHUB_OUTPUT
 
       - name: Update Version in PHP File
         run: |
-          sed -i "s/\* Version: [0-9]\+\.[0-9]\+\.[0-9]\+/\* Version: $TAG_VERSION/" pkl-api-auth.php
+          # ใช้ Regular Expression ที่รองรับเวอร์ชันที่มี -test หรืออื่นๆ ได้
+          # รูปแบบนี้จะหา 'Version:' ตามด้วยช่องว่าง และเลขเวอร์ชันใดๆ จนถึงท้ายบรรทัด
+          sed -i "s/\(\* Version: \).*/\1${{ env.TAG_VERSION }}/" pkl-api-auth.php
 
-      - name: Commit and Push Changes
+      - name: Commit and Push Version Change
         run: |
           git add pkl-api-auth.php
-          git commit -m "chore: update plugin version to $TAG_VERSION"
+          git commit -m "chore: update plugin version to ${{ env.TAG_VERSION }}"
           git push origin main
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release v${{ steps.get_version.outputs.version }}
+          # body: สามารถใส่ Changelog แบบอัตโนมัติหรือข้อความที่ต้องการได้
+          body: |
+            This release includes the latest updates. See commit history for more details.
+          draft: false
+          prerelease: ${{ contains(github.ref, '-test') || contains(github.ref, '-beta') }}
