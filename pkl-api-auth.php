@@ -30,32 +30,32 @@ define('PKL_REST_API_AUTH_PLUGIN_BASENAME', plugin_basename(__FILE__));
  * Main plugin class
  */
 class PKL_REST_API_Auth {
-    
+
     /**
      * Single instance of the class
      */
     private static $instance = null;
-    
+
     /**
      * Database handler
      */
     public $database;
-    
+
     /**
      * OAuth API handler
      */
     public $oauth_api;
-    
+
     /**
      * Admin page handler
      */
     public $admin_page;
-    
+
     /**
      * User profile handler
      */
     public $user_profile;
-    
+
     /**
      * Get single instance
      */
@@ -65,7 +65,7 @@ class PKL_REST_API_Auth {
         }
         return self::$instance;
     }
-    
+
     /**
      * Constructor
      */
@@ -73,7 +73,7 @@ class PKL_REST_API_Auth {
         $this->load_dependencies();
         $this->init_hooks();
     }
-    
+
     /**
      * Load dependencies
      */
@@ -82,48 +82,48 @@ class PKL_REST_API_Auth {
         require_once PKL_REST_API_AUTH_PLUGIN_DIR . 'includes/class-oauth-api.php';
         require_once PKL_REST_API_AUTH_PLUGIN_DIR . 'includes/class-admin-page.php';
         require_once PKL_REST_API_AUTH_PLUGIN_DIR . 'includes/class-user-profile.php';
-        
+
         $this->database = new PKL_REST_API_Auth_Database();
         $this->oauth_api = new PKL_REST_API_Auth_OAuth_API($this->database);
         $this->admin_page = new PKL_REST_API_Auth_Admin_Page($this->database);
         $this->user_profile = new PKL_REST_API_Auth_User_Profile($this->database);
     }
-    
+
     /**
      * Initialize hooks
      */
     private function init_hooks() {
         register_activation_hook(__FILE__, array($this, 'activate'));
         register_deactivation_hook(__FILE__, array($this, 'deactivate'));
-        
+
         add_action('init', array($this, 'init'));
     }
-    
+
     /**
      * Initialize the plugin
      */
     public function init() {
         // WordPress automatically loads translations since 4.6
         // No need to call load_plugin_textdomain() manually
-        
+
         // Initialize components
         $this->oauth_api->init();
         $this->user_profile->init();
-        
+
         if (is_admin()) {
             $this->admin_page->init();
         }
-        
+
         // Apply REST API authentication filter
         $this->setup_rest_auth();
     }
-    
+
     /**
      * Setup REST API authentication
      */
     private function setup_rest_auth() {
         $enable_auth = get_option('pkl_rest_api_auth_enable', 1);
-        
+
         if ($enable_auth) {
             add_filter('rest_authentication_errors', array($this, 'restrict_rest_api'));
         }
@@ -183,7 +183,7 @@ class PKL_REST_API_Auth {
 
         return false;
     }
-    
+
     /**
      * Restrict REST API access
      */
@@ -192,7 +192,7 @@ class PKL_REST_API_Auth {
         if (is_wp_error($result)) {
             return $result;
         }
-        
+
         // Check if user is logged in (traditional authentication)
         if (is_user_logged_in()) {
             if (!current_user_can('read')) {
@@ -204,7 +204,7 @@ class PKL_REST_API_Auth {
             }
             return $result;
         }
-        
+
         // Check for API key authentication
         $user = $this->check_api_key_auth();
         if ($user) {
@@ -218,7 +218,7 @@ class PKL_REST_API_Auth {
             }
             return $result;
         }
-        
+
         // No authentication found
         return new WP_Error(
             'rest_not_logged_in',
@@ -226,21 +226,21 @@ class PKL_REST_API_Auth {
             array('status' => 401)
         );
     }
-    
+
     /**
      * Plugin activation
      */
     public function activate() {
         // Create database tables
         $this->database->create_tables();
-        
+
         // Set default options
         add_option('pkl_rest_api_auth_enable', 1);
-        
+
         // Flush rewrite rules
         flush_rewrite_rules();
     }
-    
+
     /**
      * Plugin deactivation
      */
