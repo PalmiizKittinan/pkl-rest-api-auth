@@ -20,48 +20,22 @@ jobs:
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
           echo "TAG_VERSION=$TAG_VERSION" >> $GITHUB_ENV
 
-      - name: Debug - Check Current Directory and Files
+      - name: Update Version in PHP File
         run: |
-          echo "Current working directory:"
-          pwd
-          echo ""
-          echo "Files in current directory:"
-          ls -la
-          echo ""
-          echo "Search for PHP files or similar names:"
-          find . -name "*.php" -o -name "*pkl*" -type f
-          echo ""
-          echo "Check if pkl-rest-api-auth.php exists (detailed):"
-          if [ -f "pkl-rest-api-auth.php" ]; then
-            echo "File exists: pkl-rest-api-auth.php"
-            file pkl-rest-api-auth.php  # Show file type and encoding
-          else
-            echo "File does NOT exist: pkl-rest-api-auth.php"
-          fi
-
-      - name: Update Version in PHP File (Only if file exists)
-        run: |
-          if [ -f "pkl-rest-api-auth.php" ]; then
-            sed -i "s/\* Version: [0-9]\+\.[0-9]\+\.[0-9]\+/\* Version: $TAG_VERSION/" pkl-rest-api-auth.php
+          if [ -f "pkl-api-auth.php" ]; then
+            sed -i "s/\* Version: [0-9]\+\.[0-9]\+\.[0-9]\+/\* Version: $TAG_VERSION/" pkl-api-auth.php
             echo "Version updated successfully."
           else
-            echo "Error: File pkl-rest-api-auth.php not found. Skipping update."
+            echo "Error: File pkl-api-auth.php not found."
             exit 1
           fi
 
-      - name: Commit and Push Changes (Only if file exists)
+      - name: Commit and Push Changes
         run: |
-          if [ -f "pkl-rest-api-auth.php" ]; then
+          if [ -f "pkl-api-auth.php" ]; then
             git config --global user.name 'github-actions[bot]'
             git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-            if git diff --quiet; then
-              echo "No changes to commit."
-            else
-              git add pkl-rest-api-auth.php
-              git commit -m "chore: update plugin version to $TAG_VERSION"
-              git push origin main
-            fi
-          else
-            echo "Error: File pkl-rest-api-auth.php not found. Skipping push."
-            exit 1
+            git add pkl-api-auth.php
+            git commit -m "chore: update plugin version to $TAG_VERSION"
+            git push origin main
           fi
