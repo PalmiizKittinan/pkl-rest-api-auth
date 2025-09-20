@@ -55,8 +55,12 @@ jobs:
           
           rm -rf .git .github .idea .vscode node_modules tests
           rm -f .gitignore .gitattributes .distignore composer.lock package*.json yarn.lock
-          rm -f README.md *.md
           
+          find . -type f \( -iname "README.md" -o -iname "readme.md" -o -iname "license.md" -o -iname "changelog.md" -o -iname "*.md" \) -delete
+          
+          ls -la
+          
+          # สร้าง ZIP
           zip -r ../${{ github.event.repository.name }}.zip .
           
           cd ..
