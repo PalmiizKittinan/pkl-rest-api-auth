@@ -1,104 +1,232 @@
-name: Update Version and Create Release
+name: 🚀 Release Pipeline
 
 on:
   push:
     tags:
       - 'v*'
 
+env:
+  PLUGIN_NAME: ${{ github.event.repository.name }}
+
 jobs:
-  build-and-release:
+  validate:
+    name: 🔍 Validate Release
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      is-stable: ${{ steps.version.outputs.is-stable }}
+      is-prerelease: ${{ steps.version.outputs.is-prerelease }}
 
     steps:
-      - name: Checkout Repository
+      - name: 📥 Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Git Configuration
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-
-      - name: Extract Tag Version
-        id: get_version
+      - name: 🏷️ Extract and Validate Version
+        id: version
         run: |
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
-          echo "TAG_VERSION=$TAG_VERSION" >> $GITHUB_ENV
           echo "version=$TAG_VERSION" >> "$GITHUB_OUTPUT"
-
-      - name: Sync with Main Branch
-        run: |
-          git fetch origin
-          git checkout main
-          git pull origin main --rebase --allow-unrelated-histories
-          git status
-
-      - name: Update Version in PHP File (Stable Only)
-        run: |
-          echo "Current TAG_VERSION: ${{ env.TAG_VERSION }}"
+          echo "TAG_VERSION=$TAG_VERSION" >> $GITHUB_ENV
           
-          if [[ "${{ env.TAG_VERSION }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "This is a stable release. Updating version files..."
-          
-            sed -i "s/\(\* Version: \).*/\1${{ env.TAG_VERSION }}/" pkl-api-auth.php
-          
-            if grep -q "Stable tag:" readme.txt; then
-              sed -i "s/\(Stable tag: \).*/\1${{ env.TAG_VERSION }}/" readme.txt
-              echo "Updated Stable tag in readme.txt"
-            else
-              echo "Warning: Stable tag not found in readme.txt"
-            fi
-          
-            git add pkl-api-auth.php readme.txt
-            git commit -m "chore: update plugin version to ${{ env.TAG_VERSION }}"
-            git push origin main --force-with-lease
+          # Check if it's a stable release (semantic versioning)
+          if [[ "$TAG_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "is-stable=true" >> "$GITHUB_OUTPUT"
+            echo "is-prerelease=false" >> "$GITHUB_OUTPUT"
+            echo "✅ Stable release detected: $TAG_VERSION"
           else
-            echo "This is a pre-release (${{ env.TAG_VERSION }}). Skipping version file updates."
+            echo "is-stable=false" >> "$GITHUB_OUTPUT"
+            echo "is-prerelease=true" >> "$GITHUB_OUTPUT"
+            echo "🧪 Pre-release detected: $TAG_VERSION"
           fi
 
-      - name: Commit and Push Version Change
+      - name: 📋 Validate Plugin Files
         run: |
-          git add pkl-api-auth.php
-          git commit -m "chore: update plugin version to ${{ env.TAG_VERSION }}" || echo "No changes to commit"
-          git push origin main --force-with-lease || echo "Nothing to push"
+          required_files=("pkl-api-auth.php" "readme.txt")
+          for file in "${required_files[@]}"; do
+            if [[ ! -f "$file" ]]; then
+              echo "❌ Required file missing: $file"
+              exit 1
+            fi
+            echo "✅ Found: $file"
+          done
 
-      - name: Pull Latest Changes
+  build:
+    name: 🔨 Build & Package
+    runs-on: ubuntu-latest
+    needs: validate
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: ⚙️ Setup Git Configuration
         run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      - name: 🔄 Sync with Main Branch
+        run: |
+          git fetch origin main
+          git checkout main
           git pull origin main --rebase
 
-      - name: Create Clean Zip
+      - name: 📝 Update Version Files
+        if: needs.validate.outputs.is-stable == 'true'
         run: |
-          mkdir -p clean-plugin
+          VERSION="${{ needs.validate.outputs.version }}"
+          echo "🔄 Updating version to: $VERSION"
           
-          cp -r * clean-plugin/ 2>/dev/null || true
-          cd clean-plugin
+          # Update main plugin file
+          if sed -i.bak "s/\(\* Version: \s*\).*/\1$VERSION/" pkl-api-auth.php; then
+            echo "✅ Updated version in pkl-api-auth.php"
+          else
+            echo "❌ Failed to update pkl-api-auth.php"
+            exit 1
+          fi
           
-          rm -rf .git .github .idea .vscode node_modules tests
-          rm -f .gitignore .gitattributes .distignore composer.lock package*.json yarn.lock
+          # Update readme.txt stable tag
+          if grep -q "Stable tag:" readme.txt; then
+            if sed -i.bak "s/\(Stable tag: \s*\).*/\1$VERSION/" readme.txt; then
+              echo "✅ Updated stable tag in readme.txt"
+            else
+              echo "❌ Failed to update readme.txt"
+              exit 1
+            fi
+          else
+            echo "⚠️ Stable tag not found in readme.txt"
+          fi
           
-          find . -type f \( -iname "README.md" -o -iname "readme.md" -o -iname "license.md" -o -iname "changelog.md" -o -iname "LICENSE" -o -iname "update-version.js"  -o -iname "*.md" \) -delete
-          
-          rm -R clean-plugin
-          
-          ls -la
-          
-          zip -r ../${{ github.event.repository.name }}.zip .
-          
-          cd ..
+          # Clean up backup files
+          rm -f *.bak
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+      - name: 💾 Commit Version Updates
+        if: needs.validate.outputs.is-stable == 'true'
+        run: |
+          if git diff --quiet; then
+            echo "ℹ️ No changes to commit"
+          else
+            git add pkl-api-auth.php readme.txt
+            git commit -m "🔖 bump version to ${{ needs.validate.outputs.version }}"
+            git push origin main
+            echo "✅ Version files updated and pushed"
+          fi
+
+      - name: 📦 Create Distribution Package
+        run: |
+          echo "📦 Creating clean distribution package..."
+          
+          # Create temporary directory
+          TEMP_DIR=$(mktemp -d)
+          DIST_DIR="$TEMP_DIR/${{ env.PLUGIN_NAME }}"
+          
+          # Copy plugin files
+          mkdir -p "$DIST_DIR"
+          rsync -av \
+            --exclude='.git*' \
+            --exclude='.github/' \
+            --exclude='.vscode/' \
+            --exclude='.idea/' \
+            --exclude='node_modules/' \
+            --exclude='tests/' \
+            --exclude='*.md' \
+            --exclude='*.json' \
+            --exclude='*.lock' \
+            --exclude='*.log' \
+            --exclude='*.tmp' \
+            --exclude='update-version.js' \
+            --exclude='composer.*' \
+            --exclude='package*' \
+            --exclude='yarn.lock' \
+            --exclude='.distignore' \
+            --exclude='.editorconfig' \
+            --exclude='.eslintrc*' \
+            --exclude='.prettierrc*' \
+            --exclude='phpcs.xml*' \
+            --exclude='phpunit.xml*' \
+            --exclude='webpack.config.js' \
+            ./ "$DIST_DIR/"
+          
+          # Create zip archive
+          cd "$TEMP_DIR"
+          ZIP_FILE="${{ env.PLUGIN_NAME }}-${{ needs.validate.outputs.version }}.zip"
+          zip -r "$ZIP_FILE" "${{ env.PLUGIN_NAME }}/"
+          
+          # Move to workspace
+          mv "$ZIP_FILE" "$GITHUB_WORKSPACE/"
+          
+          # Display package info
+          echo "📊 Package Information:"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          ls -la "$GITHUB_WORKSPACE/$ZIP_FILE"
+          unzip -l "$GITHUB_WORKSPACE/$ZIP_FILE" | head -20
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          # Set output for next job
+          echo "ZIP_FILE=$ZIP_FILE" >> $GITHUB_ENV
+
+      - name: 📤 Upload Build Artifact
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: ${{ github.ref }}
-          name: Release v${{ steps.get_version.outputs.version }}
-          body: |
-            This release includes the latest updates. See commit history for more details.
-            - Plugin Version: ${{ env.TAG_VERSION }}
+          name: plugin-package
+          path: ${{ env.ZIP_FILE }}
+          retention-days: 30
+
+  release:
+    name: 🎉 Create Release
+    runs-on: ubuntu-latest
+    needs: [validate, build]
+    permissions:
+      contents: write
+
+    steps:
+      - name: 📥 Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: plugin-package
+
+      - name: 📋 Generate Release Notes
+        id: release-notes
+        run: |
+          VERSION="${{ needs.validate.outputs.version }}"
+          IS_PRERELEASE="${{ needs.validate.outputs.is-prerelease }}"
+          
+          cat << EOF > release-notes.md
+          ## 🚀 Release v${VERSION}
+          
+          ### 📦 Package Information
+          - **Version**: \`${VERSION}\`
+          - **Release Type**: $(if [[ "$IS_PRERELEASE" == "true" ]]; then echo "🧪 Pre-release"; else echo "✅ Stable"; fi)
+          - **Build Date**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          
+          ### 📥 Installation
+          1. Download the plugin zip file below
+          2. Upload to your WordPress site via Admin → Plugins → Add New → Upload
+          3. Activate the plugin          
+          ---
+          *This release was automatically generated by GitHub Actions*
+          EOF
+
+      - name: 🎉 Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.validate.outputs.version }}
+          name: "🚀 Release v${{ needs.validate.outputs.version }}"
+          body_path: release-notes.md
           draft: false
-          prerelease: ${{ contains(github.ref, '-test') || contains(github.ref, '-beta') || contains(github.ref, '-alpha') }}
-          files: ./${{ github.event.repository.name }}.zip
+          prerelease: ${{ needs.validate.outputs.is-prerelease }}
+          files: |
+            ${{ env.PLUGIN_NAME }}-${{ needs.validate.outputs.version }}.zip
+            generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: ✅ Release Summary
+        run: |
+          echo "🎉 Release v${{ needs.validate.outputs.version }} created successfully!"
+          echo "📦 Package: ${{ env.PLUGIN_NAME }}-${{ needs.validate.outputs.version }}.zip"
+          echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/v${{ needs.validate.outputs.version }}"

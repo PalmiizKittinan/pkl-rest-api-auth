@@ -1,30 +1,68 @@
 /* PKL REST API Auth Admin Styles */
-.pkl-guide-section {
-    max-width: 900px;
+
+/* Base container for tab sections */
+.tab-content {
+    margin-top: 20px;
+    padding: 1px 0; /* Add slight vertical padding to ensure content doesn't touch the top if there's no specific margin */
 }
 
+/* General section styling for guide and tokens */
+.pkl-guide-section,
+.pkl-tokens-section {
+    max-width: 960px; /* Slightly increase max-width for better use of space */
+    margin-right: auto; /* Center the content if the screen is wider than max-width */
+    margin-left: auto;  /* Center the content */
+    padding: 0 15px; /* Add some horizontal padding for smaller screens */
+}
+
+/* Guide box styling */
 .pkl-guide-box {
     background: #fff;
-    border: 1px solid #ddd;
-    border-left: 4px solid #0073aa;
-    padding: 20px;
+    border: 1px solid #c3c4c7; /* Slightly darker, more official WP-like border */
+    border-left: 4px solid #0073aa; /* Keep the WP blue accent */
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04); /* subtle shadow for depth */
+    padding: 20px 25px; /* Increase horizontal padding slightly */
     margin: 20px 0;
+    border-radius: 4px; /* Slightly rounded corners for a softer look */
 }
 
 .pkl-guide-box h3 {
     margin-top: 0;
-    color: #0073aa;
+    margin-bottom: 15px; /* Add some space below the heading */
+    color: #0073aa; /* Keep WP blue for headings */
+    font-size: 1.25em; /* Slightly larger, more prominent heading */
+    border-bottom: 1px solid #eee; /* Subtle underline for visual separation */
+    padding-bottom: 10px; /* Space between text and underline */
 }
 
+.pkl-guide-box ol {
+    margin-left: 20px; /* Indent list items */
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.pkl-guide-box ol li {
+    margin-bottom: 8px; /* Space between list items */
+}
+
+
+/* Code block styling */
 .pkl-code-block {
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
+    background: #f0f0f1; /* Lighter background for code blocks, similar to WP's block editor code blocks */
+    border: 1px solid #dcdcde; /* Softer border */
     border-radius: 4px;
     padding: 15px;
-    margin: 10px 0;
-    font-family: 'Courier New', monospace;
+    margin: 10px 0 20px 0; /* Add more space below code blocks */
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; /* Modern monospace font stack */
     font-size: 13px;
-    line-height: 1.5;
+    line-height: 1.6; /* Slightly increased line-height for readability */
+    color: #333; /* Darker text for better contrast */
+    overflow-x: auto; /* Ensure horizontal scrolling for long lines */
+    position: relative; /* For potential copy button later */
+}
+
+.pkl-code-block strong {
+    color: #222; /* Make bold text inside code block stand out a bit more */
 }
 
 .pkl-code-block pre {
@@ -33,43 +71,133 @@
     border: none;
     padding: 0;
     font-family: inherit;
+    white-space: pre-wrap; /* Ensure preformatted text wraps if it's too long */
+    word-break: break-all; /* Break words to prevent overflow */
 }
 
+/* Table styling for tokens section */
 .pkl-tokens-section .wp-list-table {
     margin-top: 20px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04); /* Subtle shadow for the table */
+    border: 1px solid #c3c4c7; /* Match guide box border */
+    border-radius: 4px; /* Soften table corners */
 }
 
+.pkl-tokens-section h2 {
+    margin-bottom: 15px;
+    color: #2c3338; /* Standard WP dark text color */
+}
+
+/* Row colors for token status */
 .pkl-token-revoked {
-    background-color: #ffebee !important;
+    background-color: #fce8e8 !important; /* Lighter, less aggressive red */
 }
 
 .pkl-token-active {
-    background-color: #e8f5e8 !important;
+    background-color: #e8fce8 !important; /* Lighter, less aggressive green */
 }
 
+/* Status text colors */
 .pkl-status-active {
-    color: #2e7d32;
-    font-weight: bold;
+    color: #228b22; /* A slightly softer green */
+    font-weight: 600; /* Medium bold */
 }
 
 .pkl-status-revoked {
-    color: #c62828;
-    font-weight: bold;
+    color: #dc3232; /* Match WP red for errors/warnings */
+    font-weight: 600; /* Medium bold */
+}
+
+/* Actions column styling */
+.pkl-actions {
+    white-space: nowrap; /* Prevent action buttons from wrapping to next line */
 }
 
 .pkl-actions form {
     margin-right: 5px;
+    display: inline-block; /* Ensure forms are inline */
+    vertical-align: middle; /* Align buttons nicely */
+}
+
+/* Nav tabs styling */
+.nav-tab-wrapper {
+    margin-bottom: 0; /* Remove default margin to let tab-content manage spacing */
+    border-bottom: 1px solid #c3c4c7; /* A more distinct tab bottom border */
+}
+
+.nav-tab {
+    padding: 8px 15px; /* Slightly more padding for a better clickable area */
+    font-size: 14px;
+    color: #50575e; /* Default gray for inactive tabs */
+    border-bottom: none; /* Remove individual tab bottom border */
+    margin-bottom: -1px; /* Overlap border with wrapper */
+}
+
+.nav-tab-active {
+    background-color: #fff;
+    border-color: #c3c4c7 #c3c4c7 #fff; /* Active tab border: top, sides same as wrapper, bottom transparent */
+    color: #0073aa; /* Active tab text color */
+    font-weight: 600; /* Make active tab text bolder */
 }
 
 .nav-tab .count {
     background: #0073aa;
     color: white;
     border-radius: 10px;
-    padding: 2px 6px;
+    padding: 2px 7px; /* Slightly more padding for count */
     font-size: 11px;
-    margin-left: 5px;
+    margin-left: 6px; /* Slightly more space */
+    min-width: 20px; /* Ensure minimum width for single-digit counts */
+    text-align: center; /* Center the count number */
+    display: inline-block; /* For min-width to work */
+    line-height: normal; /* Adjust line-height for count */
 }
 
-.tab-content {
+/* Info notices */
+.notice.notice-info.inline {
     margin-top: 20px;
+    margin-bottom: 20px; /* Consistent vertical spacing */
+    position: relative; /* For icon positioning if added */
+    padding: 15px 20px 15px 50px; /* Space for icon */
+    background-color: #e5f5fb; /* Lighter blue background */
+    border-left-color: #007cba; /* Match WP blue for info */
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+}
+.notice.notice-info.inline:before {
+    font-family: dashicons, serif;
+    content: "\f348"; /* Dashed icon for info */
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #007cba;
+    font-size: 1.5em;
+}
+
+.notice.notice-info.inline p,
+.notice.notice-info.inline ul {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #32373c;
+}
+.notice.notice-info.inline ul {
+    list-style: disc; /* Ensure bullet points are visible */
+    margin-left: 25px; /* Indent the list */
+}
+.notice.notice-info.inline ul li {
+    margin-bottom: 5px;
+}
+
+/* Settings tab form table adjustments */
+.form-table th {
+    width: 280px; /* Give more consistent width to labels */
+}
+.form-table td {
+    padding-left: 10px; /* More space between label and input */
+}
+.form-table .description {
+    margin-top: 5px;
+    font-style: italic;
+    color: #646970;
 }
