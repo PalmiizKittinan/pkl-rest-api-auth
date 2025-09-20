@@ -56,7 +56,7 @@ jobs:
           rm -rf .git .github .idea .vscode node_modules tests
           rm -f .gitignore .gitattributes .distignore composer.lock package*.json yarn.lock
           
-          find . -type f \( -iname "README.md" -o -iname "readme.md" -o -iname "license.md" -o -iname "changelog.md" -o -iname "*.md" \) -delete
+          find . -type f \( -iname "README.md" -o -iname "readme.md" -o -iname "license.md" -o -iname "changelog.md" -o -iname "LICENSE" -o -iname "*.md" \) -delete
           
           ls -la
           
