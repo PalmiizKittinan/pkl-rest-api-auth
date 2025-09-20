@@ -12,10 +12,15 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Setup Git Configuration
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
       - name: Extract Tag Version
         id: get_version
@@ -24,48 +29,46 @@ jobs:
           echo "TAG_VERSION=$TAG_VERSION" >> $GITHUB_ENV
           echo "version=$TAG_VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Setup Git and Checkout Main
+      - name: Sync with Main Branch
         run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          # แก้ปัญหา Detached HEAD: Fetch และ Checkout main แท้จริง
+          git fetch origin
+          git checkout main
+          git pull origin main --rebase --allow-unrelated-histories  # ปลอดภัยถ้ามี conflict เล็กน้อย
+          git status  # ตรวจสอบสภาพ
 
       - name: Update Version in PHP File
         run: |
+          # อัปเดตเวอร์ชันในไฟล์ PHP (ปรับ regex หากจำเป็น)
           sed -i "s/\(\* Version: \).*/\1${{ env.TAG_VERSION }}/" pkl-api-auth.php
 
       - name: Commit and Push Version Change
         run: |
           git add pkl-api-auth.php
           git commit -m "chore: update plugin version to ${{ env.TAG_VERSION }}"
-          git push origin main
+          # ใช้ force-with-lease เพื่อ push ปลอดภัย
+          git push origin main --force-with-lease
 
       - name: Create Clean Zip
         run: |
-          # Remove development files
+          # ลบไฟล์ที่ไม่จำเป็น
           rm -rf .git .github .idea .vscode node_modules tests
-          rm -f .gitignore .gitattributes .distignore
-          rm -f composer.lock package-lock.json yarn.lock
+          rm -f .gitignore .gitattributes .distignore composer.lock package-lock.json yarn.lock
           rm -f README.md *.md
-
-          # Create zip file
-          zip -r ${{ github.event.repository.name }}.zip . -x ".*"
-
-      - name: Create Release Zip
-        run: |
-          # Create release zip (alternative method in one step)
-          git archive --format=zip --output=${{ github.event.repository.name }}-release.zip HEAD
+          
+          # แก้ไขปัญหา: สร้าง ZIP จาก main branch แทน detached state
+          git archive --format=zip --output=${{ github.event.repository.name }}.zip HEAD
 
       - name: Create GitHub Release
-        id: create_release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref }}
           name: Release v${{ steps.get_version.outputs.version }}
           body: |
             This release includes the latest updates. See commit history for more details.
+            - Plugin Version: ${{ env.TAG_VERSION }}
           draft: false
           prerelease: ${{ contains(github.ref, '-test') || contains(github.ref, '-beta') || contains(github.ref, '-alpha') }}
-          files: |
-            ./${{ github.event.repository.name }}.zip
+          files: ./${{ github.event.repository.name }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
