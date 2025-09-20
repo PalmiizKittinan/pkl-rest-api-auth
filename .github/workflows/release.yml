@@ -29,7 +29,7 @@ jobs:
         run: |
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
           echo "TAG_VERSION=$TAG_VERSION" >> $GITHUB_ENV
-          echo "version=$TAG_VERSION" >> "$GITHUB_OUTPUT" 
+          echo "version=$TAG_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Update Version in PHP File
         run: |
@@ -41,6 +41,17 @@ jobs:
           git commit -m "chore: update plugin version to ${{ env.TAG_VERSION }}"
           git push origin main
 
+      - name: Create Clean Zip
+        run: |
+          # Remove development files
+          rm -rf .git .github .idea .vscode node_modules tests
+          rm -f .gitignore .gitattributes .distignore
+          rm -f composer.lock package-lock.json yarn.lock
+          rm -f README.md *.md
+
+          # Create zip file
+          zip -r ${{ github.event.repository.name }}.zip . -x ".*"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
@@ -50,5 +61,15 @@ jobs:
             This release includes the latest updates. See commit history for more details.
           draft: false
           prerelease: ${{ contains(github.ref, '-test') || contains(github.ref, '-beta') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ github.event.repository.name }}.zip
+          asset_name: ${{ github.event.repository.name }}.zip
+          asset_content_type: application/zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

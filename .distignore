@@ -1,0 +1,29 @@
+# IDE files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# Development files
+node_modules/
+composer.lock
+package-lock.json
+yarn.lock
+
+# Build tools
+webpack.config.js
+gulpfile.js
+gruntfile.js
+
+# Documentation
+README.md
+.md
+
+# Testing
+tests/
+phpunit.xml
