@@ -53,9 +53,7 @@ class PKL_REST_API_Auth_User_Profile
         );
 
         wp_enqueue_script('jquery');
-        wp_enqueue_script('pkl-rest-api-auth-profile', '', array('jquery'), PKL_REST_API_AUTH_VERSION, true);
-        $js_code = $this->get_profile_js();
-        wp_add_inline_script('pkl-rest-api-auth-profile', $js_code);
+        wp_add_inline_script('jquery', $this->get_profile_js());
     }
 
     /**
