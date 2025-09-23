@@ -149,50 +149,55 @@ class PKL_REST_API_Auth_User_Profile
     /**
      * Add API key fields to user profile
      */
-    public function add_api_key_fields($user)
-    {
-        $current_user_id = get_current_user_id();
+	public function add_api_key_fields($user)
+	{
+		$current_user_id = get_current_user_id();
 
-        // Only show to the user themselves or admins
-        if ($user->ID !== $current_user_id && !current_user_can('manage_options')) {
-            return;
-        }
+		// Only show to the user themselves or admins
+		if ($user->ID !== $current_user_id && !current_user_can('manage_options')) {
+			return;
+		}
 
-        $api_key_data = $this->database->get_user_api_key($user->ID);
-        $is_revoked = $api_key_data && $api_key_data['revoked'];
-        $is_admin = current_user_can('manage_options');
-        ?>
+		$api_key_data = $this->database->get_user_api_key($user->ID);
+		$is_revoked = $api_key_data && $api_key_data['revoked'];
+		$is_admin = current_user_can('manage_options');
+		?>
         <h3><?php esc_html_e('REST API Access', 'pkl-rest-api-auth'); ?></h3>
         <table class="form-table">
             <tr>
                 <th><label><?php esc_html_e('API Key', 'pkl-rest-api-auth'); ?></label></th>
                 <td>
-                    <?php if ($api_key_data): ?>
+					<?php if ($api_key_data): ?>
                         <p>
                             <code id="pkl-api-key-display" style="<?php echo $api_key_data['revoked'] ? 'display:none;' : ''; ?>">
-                                <?php echo $api_key_data['revoked'] ? '' : esc_html($api_key_data['access_token']); ?>
+								<?php echo $api_key_data['revoked'] ? '' : esc_html($api_key_data['access_token']); ?>
                             </code>
                         </p>
                         <p>
                             <strong><?php esc_html_e('Status:', 'pkl-rest-api-auth'); ?></strong>
                             <span id="pkl-api-key-status" class="<?php echo $api_key_data['revoked'] ? 'pkl-status-revoked' : 'pkl-status-active'; ?>">
-                                <?php echo $api_key_data['revoked'] ? esc_html__('Revoked', 'pkl-rest-api-auth') : esc_html__('Active', 'pkl-rest-api-auth'); ?>
-                            </span>
+                            <?php echo $api_key_data['revoked'] ? esc_html__('Revoked', 'pkl-rest-api-auth') : esc_html__('Active', 'pkl-rest-api-auth'); ?>
+                        </span>
                         </p>
                         <p>
                             <strong><?php esc_html_e('Created:', 'pkl-rest-api-auth'); ?></strong>
-                            <?php echo esc_html(mysql2date(get_option('date_format') . ' ' . get_option('time_format'), $api_key_data['created_at'])); ?>
+							<?php
+							// แปลงวันที่เป็น UTC+7 (Asia/Bangkok timezone)
+							$created_date = new DateTime($api_key_data['created_at'], new DateTimeZone('UTC'));
+							$created_date->setTimezone(new DateTimeZone('Asia/Bangkok'));
+							echo esc_html($created_date->format('Y-m-d\TH:i:sP'));
+							?>
                         </p>
-                    <?php else: ?>
+					<?php else: ?>
                         <p><em><?php esc_html_e('No API key generated yet.', 'pkl-rest-api-auth'); ?></em></p>
                         <code id="pkl-api-key-display" style="display:none;"></code>
                         <p>
                             <strong><?php esc_html_e('Status:', 'pkl-rest-api-auth'); ?></strong>
                             <span id="pkl-api-key-status" class="pkl-status-revoked"><?php esc_html_e('No Key', 'pkl-rest-api-auth'); ?></span>
                         </p>
-                    <?php endif; ?>
+					<?php endif; ?>
 
-                    <?php if ($is_revoked && !$is_admin): ?>
+					<?php if ($is_revoked && !$is_admin): ?>
                         <!-- Revoked user can't generate new key -->
                         <div class="notice notice-error inline" style="margin: 10px 0;">
                             <p><strong><?php esc_html_e('Access Restricted', 'pkl-rest-api-auth'); ?></strong></p>
@@ -200,46 +205,46 @@ class PKL_REST_API_Auth_User_Profile
                         </div>
                         <p>
                             <button type="button" class="button button-primary" disabled>
-                                <?php esc_html_e('Generate New API Key', 'pkl-rest-api-auth'); ?>
+								<?php esc_html_e('Generate New API Key', 'pkl-rest-api-auth'); ?>
                             </button>
                             <span class="description" style="margin-left: 10px;">
-                                <?php esc_html_e('Contact administrator for access restoration', 'pkl-rest-api-auth'); ?>
-                            </span>
+                            <?php esc_html_e('Contact administrator for access restoration', 'pkl-rest-api-auth'); ?>
+                        </span>
                         </p>
-                    <?php else: ?>
+					<?php else: ?>
                         <!-- Normal users or admins can generate keys -->
                         <p>
                             <button type="button" id="pkl-generate-api-key" class="button button-primary" data-user-id="<?php echo esc_attr($user->ID); ?>">
-                                <?php esc_html_e('Generate New API Key', 'pkl-rest-api-auth'); ?>
+								<?php esc_html_e('Generate New API Key', 'pkl-rest-api-auth'); ?>
                             </button>
 
-                            <?php if ($api_key_data && !$api_key_data['revoked']): ?>
+							<?php if ($api_key_data && !$api_key_data['revoked']): ?>
                                 <button type="button" id="pkl-revoke-api-key" class="button button-secondary" data-user-id="<?php echo esc_attr($user->ID); ?>">
-                                    <?php esc_html_e('Revoke API Key', 'pkl-rest-api-auth'); ?>
+									<?php esc_html_e('Revoke API Key', 'pkl-rest-api-auth'); ?>
                                 </button>
-                            <?php else: ?>
+							<?php else: ?>
                                 <button type="button" id="pkl-revoke-api-key" class="button button-secondary" data-user-id="<?php echo esc_attr($user->ID); ?>" style="display:none;">
-                                    <?php esc_html_e('Revoke API Key', 'pkl-rest-api-auth'); ?>
+									<?php esc_html_e('Revoke API Key', 'pkl-rest-api-auth'); ?>
                                 </button>
-                            <?php endif; ?>
+							<?php endif; ?>
                         </p>
 
-                        <?php if ($is_admin && $is_revoked): ?>
+						<?php if ($is_admin && $is_revoked): ?>
                             <div class="notice notice-warning inline" style="margin: 10px 0;">
                                 <p><strong><?php esc_html_e('Administrator Notice', 'pkl-rest-api-auth'); ?></strong></p>
                                 <p><?php esc_html_e('This user\'s API key is revoked. As an administrator, you can generate a new key to restore access.', 'pkl-rest-api-auth'); ?></p>
                             </div>
-                        <?php endif; ?>
-                    <?php endif; ?>
+						<?php endif; ?>
+					<?php endif; ?>
 
                     <p class="description">
-                        <?php esc_html_e('Use this API key to authenticate REST API requests. Keep it secure and do not share it with others.', 'pkl-rest-api-auth'); ?>
+						<?php esc_html_e('Use this API key to authenticate REST API requests. Keep it secure and do not share it with others.', 'pkl-rest-api-auth'); ?>
                     </p>
                 </td>
             </tr>
         </table>
-        <?php
-    }
+		<?php
+	}
 
     /**
      * AJAX: Generate API key
