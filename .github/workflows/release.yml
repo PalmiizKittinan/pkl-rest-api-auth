@@ -55,7 +55,8 @@ jobs:
     name: 🔨 Build & Package
     runs-on: ubuntu-latest
     needs: validate
-
+    permissions:
+      contents: write
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
@@ -63,38 +64,26 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: ⚙️ Setup Git Configuration
+      - name: ⚙️ Setup and Validate
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git config --global pull.rebase true
-
-      - name: 🔄 Smart Branch Sync
-        run: |
-          echo "🔍 Checking current state..."
+          
+          echo "🔍 Current state:"
+          git log --oneline -5
           git status
           
-          # Get the current commit hash
-          CURRENT_COMMIT=$(git rev-parse HEAD)
-          echo "Current commit: $CURRENT_COMMIT"
+          # Validate tagged commit has required files
+          required_files=("pkl-api-auth.php" "readme.txt")
+          for file in "${required_files[@]}"; do
+            if [[ ! -f "$file" ]]; then
+              echo "❌ Required file missing in tag: $file"
+              exit 1
+            fi
+            echo "✅ Found: $file"
+          done
           
-          # Fetch latest main
-          git fetch origin main
-          
-          # Check if we're already on main or if main has diverged
-          if git merge-base --is-ancestor HEAD origin/main; then
-            echo "✅ Current commit is ancestor of main, safe to proceed"
-            git checkout main
-            git reset --hard origin/main
-          elif git merge-base --is-ancestor origin/main HEAD; then
-            echo "✅ Main is ancestor of current commit, creating new branch"
-            # Create a temporary branch from current state
-            git checkout -b "temp-release-${{ needs.validate.outputs.version }}"
-          else
-            echo "⚠️ Branches have diverged, using current tagged state"
-            # Stay on current commit, don't try to sync with main
-            echo "Using tagged commit as base for release"
-          fi
+          echo "✅ All required files present in tagged commit"
 
       - name: 📝 Update Version Files (Stable Only)
         if: needs.validate.outputs.is-stable == 'true'
@@ -102,21 +91,25 @@ jobs:
           VERSION="${{ needs.validate.outputs.version }}"
           echo "🔄 Updating version to: $VERSION"
           
-          # Check if files exist before updating
+          # Update version in pkl-api-auth.php
           if [[ -f "pkl-api-auth.php" ]]; then
             if sed -i.bak "s/\(\* Version: \s*\).*/\1$VERSION/" pkl-api-auth.php; then
               echo "✅ Updated version in pkl-api-auth.php"
+              cat pkl-api-auth.php | grep "Version:" | head -1
             else
               echo "❌ Failed to update pkl-api-auth.php"
               exit 1
             fi
           else
-            echo "⚠️ pkl-api-auth.php not found, skipping version update"
+            echo "❌ pkl-api-auth.php not found"
+            exit 1
           fi
           
+          # Update stable tag in readme.txt
           if [[ -f "readme.txt" ]] && grep -q "Stable tag:" readme.txt; then
             if sed -i.bak "s/\(Stable tag: \s*\).*/\1$VERSION/" readme.txt; then
               echo "✅ Updated stable tag in readme.txt"
+              cat readme.txt | grep "Stable tag:" | head -1
             else
               echo "❌ Failed to update readme.txt"
               exit 1
@@ -125,27 +118,28 @@ jobs:
             echo "⚠️ readme.txt not found or no stable tag found"
           fi
           
+          # Clean up backup files
           rm -f *.bak
+          
+          echo "📋 Changes made:"
+          git diff --name-only
+          git diff
 
-      - name: 💾 Commit Version Updates (Stable Only)
+      - name: 💾 Create Version Commit (Stable Only)
         if: needs.validate.outputs.is-stable == 'true'
         run: |
           if git diff --quiet; then
             echo "ℹ️ No changes to commit"
           else
-            git add .
+            # Create a new branch for the version update
+            BRANCH_NAME="release-v${{ needs.validate.outputs.version }}"
+            git checkout -b "$BRANCH_NAME"
+          
+            git add pkl-api-auth.php readme.txt
             git commit -m "🔖 bump version to ${{ needs.validate.outputs.version }}"
           
-            # Try to push to main if we're on main, otherwise create PR
-            CURRENT_BRANCH=$(git branch --show-current)
-            if [[ "$CURRENT_BRANCH" == "main" ]]; then
-              git push origin main
-              echo "✅ Version files updated and pushed to main"
-            else
-              git push origin "$CURRENT_BRANCH"
-              echo "✅ Version files updated on branch $CURRENT_BRANCH"
-              echo "💡 Consider creating a PR to merge these changes to main"
-            fi
+            echo "✅ Version files updated in branch $BRANCH_NAME"
+            echo "💡 Changes committed for release packaging"
           fi
 
       - name: 📦 Create Distribution Package
@@ -195,6 +189,7 @@ jobs:
           echo "📊 Package Information:"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           ls -la "$GITHUB_WORKSPACE/$ZIP_FILE"
+          echo "Package contents:"
           unzip -l "$GITHUB_WORKSPACE/$ZIP_FILE" | head -20
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           
