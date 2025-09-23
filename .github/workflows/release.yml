@@ -68,27 +68,54 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config --global pull.rebase true
 
-      - name: 🔄 Sync with Main Branch
+      - name: 🔄 Smart Branch Sync
         run: |
+          echo "🔍 Checking current state..."
+          git status
+          
+          # Get the current commit hash
+          CURRENT_COMMIT=$(git rev-parse HEAD)
+          echo "Current commit: $CURRENT_COMMIT"
+          
+          # Fetch latest main
           git fetch origin main
-          git checkout main
-          git reset --hard origin/main
+          
+          # Check if we're already on main or if main has diverged
+          if git merge-base --is-ancestor HEAD origin/main; then
+            echo "✅ Current commit is ancestor of main, safe to proceed"
+            git checkout main
+            git reset --hard origin/main
+          elif git merge-base --is-ancestor origin/main HEAD; then
+            echo "✅ Main is ancestor of current commit, creating new branch"
+            # Create a temporary branch from current state
+            git checkout -b "temp-release-${{ needs.validate.outputs.version }}"
+          else
+            echo "⚠️ Branches have diverged, using current tagged state"
+            # Stay on current commit, don't try to sync with main
+            echo "Using tagged commit as base for release"
+          fi
 
-      - name: 📝 Update Version Files
+      - name: 📝 Update Version Files (Stable Only)
         if: needs.validate.outputs.is-stable == 'true'
         run: |
           VERSION="${{ needs.validate.outputs.version }}"
           echo "🔄 Updating version to: $VERSION"
           
-          if sed -i.bak "s/\(\* Version: \s*\).*/\1$VERSION/" pkl-api-auth.php; then
-            echo "✅ Updated version in pkl-api-auth.php"
+          # Check if files exist before updating
+          if [[ -f "pkl-api-auth.php" ]]; then
+            if sed -i.bak "s/\(\* Version: \s*\).*/\1$VERSION/" pkl-api-auth.php; then
+              echo "✅ Updated version in pkl-api-auth.php"
+            else
+              echo "❌ Failed to update pkl-api-auth.php"
+              exit 1
+            fi
           else
-            echo "❌ Failed to update pkl-api-auth.php"
-            exit 1
+            echo "⚠️ pkl-api-auth.php not found, skipping version update"
           fi
           
-          if grep -q "Stable tag:" readme.txt; then
+          if [[ -f "readme.txt" ]] && grep -q "Stable tag:" readme.txt; then
             if sed -i.bak "s/\(Stable tag: \s*\).*/\1$VERSION/" readme.txt; then
               echo "✅ Updated stable tag in readme.txt"
             else
@@ -96,21 +123,30 @@ jobs:
               exit 1
             fi
           else
-            echo "⚠️ Stable tag not found in readme.txt"
+            echo "⚠️ readme.txt not found or no stable tag found"
           fi
           
           rm -f *.bak
 
-      - name: 💾 Commit Version Updates
+      - name: 💾 Commit Version Updates (Stable Only)
         if: needs.validate.outputs.is-stable == 'true'
         run: |
           if git diff --quiet; then
             echo "ℹ️ No changes to commit"
           else
-            git add pkl-api-auth.php readme.txt
+            git add .
             git commit -m "🔖 bump version to ${{ needs.validate.outputs.version }}"
-            git push origin main
-            echo "✅ Version files updated and pushed"
+          
+            # Try to push to main if we're on main, otherwise create PR
+            CURRENT_BRANCH=$(git branch --show-current)
+            if [[ "$CURRENT_BRANCH" == "main" ]]; then
+              git push origin main
+              echo "✅ Version files updated and pushed to main"
+            else
+              git push origin "$CURRENT_BRANCH"
+              echo "✅ Version files updated on branch $CURRENT_BRANCH"
+              echo "💡 Consider creating a PR to merge these changes to main"
+            fi
           fi
 
       - name: 📦 Create Distribution Package
@@ -121,6 +157,8 @@ jobs:
           DIST_DIR="$TEMP_DIR/${{ env.PLUGIN_NAME }}"
           
           mkdir -p "$DIST_DIR"
+          
+          # Copy files, excluding development files
           rsync -av \
             --exclude='.git*' \
             --exclude='.github/' \
@@ -144,7 +182,10 @@ jobs:
             --exclude='phpcs.xml*' \
             --exclude='phpunit.xml*' \
             --exclude='webpack.config.js' \
-            ./ "$DIST_DIR/"
+            ./ "$DIST_DIR/" || {
+              echo "❌ Failed to copy files"
+              exit 1
+            }
           
           cd "$TEMP_DIR"
           ZIP_FILE="${{ env.PLUGIN_NAME }}-${{ needs.validate.outputs.version }}.zip"
@@ -214,7 +255,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ needs.validate.outputs.version }}
-          name: "${{ steps.release-notes.outputs.release_title }}"
+          name: "Release v${{ needs.validate.outputs.version }}"
           body_path: release-notes.md
           draft: false
           prerelease: ${{ needs.validate.outputs.is-prerelease }}
