@@ -173,6 +173,10 @@ class PKL_REST_API_Auth_Admin_Page
 
 	    // Show messages
 	    if (isset($_GET['message'])) {
+            if (!wp_verify_nonce(wp_create_nonce('pkl_admin_message'), 'pkl_admin_message')) {
+                wp_die('Security check failed');
+            }
+
 		    $message = sanitize_text_field(wp_unslash($_GET['message']));
 		    $class = 'notice-success';
 		    $text = '';

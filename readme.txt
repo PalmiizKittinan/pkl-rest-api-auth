@@ -1,5 +1,5 @@
 === PKL REST API Auth ===
-Contributors: palmiizkittinan
+Contributors: Palmiiz Kittinan
 Tags: rest-api, authentication, api-key, security, access-control
 Requires at least: 5.0
 Tested up to: 6.8
