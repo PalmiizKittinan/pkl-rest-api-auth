@@ -98,8 +98,10 @@ Patch security update. Add Bearer token method
 = 2.2.2 =
 Patch security update
 
-= 2.2.3 =
+= 2.3.0 =
 Patch security update
+Minor bug fixes
+Recoding for wordpress.org template
 
 == Developer Documentation ==
 
