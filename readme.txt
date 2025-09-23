@@ -109,6 +109,10 @@ Bug Fixes
 = 2.3.2 =
 Bug Fixes
 
+= 2.3.3 =
+Bug Fixes
+* Datetime bug fixes
+
 == Developer Documentation ==
 
 For detailed API documentation and examples, visit the plugin settings page in your WordPress admin.

@@ -289,50 +289,23 @@ class PKL_REST_API_Auth_Admin_Page {
 								<?php endif; ?>
                             </td>
                             <td>
-								<?php
-								$created_date = new DateTime( $api_key_data['created_at'], new DateTimeZone( 'UTC' ) );
+                                <?php
+                                if (function_exists('wp_timezone')) {
+                                    $wp_timezone = wp_timezone();
+                                    $created_date = new DateTime($api_key_data['created_at'], $wp_timezone);
 
-								$display_timezone_name = '';
+                                    echo esc_html($created_date->format('Y-m-d\TH:i:s'));
+                                    echo ' ' . esc_html($wp_timezone->getName()) . ' ';
+                                    echo esc_html__('(WordPress Site Time)', 'pkl-rest-api-auth');
+                                } else {
+                                    $server_timezone = new DateTimeZone(date_default_timezone_get());
+                                    $created_date = new DateTime($api_key_data['created_at'], $server_timezone);
 
-								if ( function_exists( 'wp_timezone' ) ) {
-									$user_timezone_obj = wp_timezone();
-									$created_date->setTimezone( $user_timezone_obj );
-
-									$timezone_id = $user_timezone_obj->getName();
-
-									if ( class_exists( 'IntlDateFormatter' ) ) {
-										$formatter             = new IntlDateFormatter(
-											'th_TH',
-											IntlDateFormatter::FULL,
-											IntlDateFormatter::FULL,
-											$timezone_id,
-											IntlDateFormatter::GREGORIAN
-										);
-										$display_timezone_name = $formatter->getTimeZone()->getDisplayName( false, IntlTimeZone::DISPLAY_LONG );
-									}
-
-									// Fallback ถ้า IntlDateFormatter ไม่มีหรือไม่สามารถหาชื่อได้
-									if ( empty( $display_timezone_name ) || strpos( $display_timezone_name, '/' ) !== false ) {
-										$offset_seconds        = $created_date->getOffset();
-										$offset_hours          = $offset_seconds / 3600;
-										$sign                  = ( $offset_hours >= 0 ) ? '+' : '-';
-										$abs_offset_hours      = abs( $offset_hours );
-										$offset_fraction       = ( $abs_offset_hours - floor( $abs_offset_hours ) ) * 60;
-										$display_timezone_name = sprintf( 'UTC%s%02d:%02d', $sign, floor( $abs_offset_hours ), $offset_fraction );
-									}
-
-									$display_timezone_info = esc_html__( '(WordPress Site Time)', 'pkl-rest-api-auth' );
-								} else {
-									$current_timezone = new DateTimeZone( date_default_timezone_get() ); // Timezone ของ PHP server
-									$created_date->setTimezone( $current_timezone );
-									$display_timezone_name = $current_timezone->getName();
-									$display_timezone_info = esc_html__( '(Server Time)', 'pkl-rest-api-auth' );
-								}
-
-								echo esc_html( $created_date->format( 'Y-m-d\TH:i:s' ) );
-								echo ' ' . esc_html( $display_timezone_name ) . ' ';
-								echo esc_html($display_timezone_info);
-								?>
+                                    echo esc_html($created_date->format('Y-m-d\TH:i:s'));
+                                    echo ' ' . esc_html($server_timezone->getName()) . ' ';
+                                    echo esc_html__('(Server Time)', 'pkl-rest-api-auth');
+                                }
+                                ?>
                             </td>
                             <td class="pkl-actions">
 								<?php if ( $token['revoked'] ): ?>
