@@ -8,6 +8,7 @@
  * Author URI: https://github.com/PalmiizKittinan
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: pkl-rest-api-auth
  * Domain Path: /languages
  * Requires at least: 5.0
  * Tested up to: 6.8
@@ -28,8 +29,7 @@ define('PKL_REST_API_AUTH_PLUGIN_BASENAME', plugin_basename(__FILE__));
 /**
  * Main plugin class
  */
-class PKL_REST_API_Auth
-{
+class PKL_REST_API_Auth {
 
 	/**
 	 * Single instance of the class
@@ -59,8 +59,7 @@ class PKL_REST_API_Auth
 	/**
 	 * Get single instance
 	 */
-	public static function get_instance()
-	{
+	public static function get_instance() {
 		if (null === self::$instance) {
 			self::$instance = new self();
 		}
@@ -70,8 +69,7 @@ class PKL_REST_API_Auth
 	/**
 	 * Constructor
 	 */
-	private function __construct()
-	{
+	private function __construct() {
 		$this->load_dependencies();
 		$this->init_hooks();
 	}
@@ -79,8 +77,7 @@ class PKL_REST_API_Auth
 	/**
 	 * Load dependencies
 	 */
-	private function load_dependencies()
-	{
+	private function load_dependencies() {
 		require_once PKL_REST_API_AUTH_PLUGIN_DIR . 'includes/class-database.php';
 		require_once PKL_REST_API_AUTH_PLUGIN_DIR . 'includes/class-oauth-api.php';
 		require_once PKL_REST_API_AUTH_PLUGIN_DIR . 'includes/class-admin-page.php';
@@ -95,8 +92,7 @@ class PKL_REST_API_Auth
 	/**
 	 * Initialize hooks
 	 */
-	private function init_hooks()
-	{
+	private function init_hooks() {
 		register_activation_hook(__FILE__, array($this, 'activate'));
 		register_deactivation_hook(__FILE__, array($this, 'deactivate'));
 
@@ -106,8 +102,11 @@ class PKL_REST_API_Auth
 	/**
 	 * Initialize the plugin
 	 */
-	public function init()
-	{
+	public function init() {
+		// WordPress automatically loads translations since 4.6
+		// No need to call load_plugin_textdomain() manually
+
+		// Initialize components
 		$this->oauth_api->init();
 		$this->user_profile->init();
 
@@ -115,14 +114,14 @@ class PKL_REST_API_Auth
 			$this->admin_page->init();
 		}
 
+		// Apply REST API authentication filter
 		$this->setup_rest_auth();
 	}
 
 	/**
 	 * Setup REST API authentication
 	 */
-	private function setup_rest_auth()
-	{
+	private function setup_rest_auth() {
 		$enable_auth = get_option('pkl_rest_api_auth_enable', 1);
 
 		if ($enable_auth) {
@@ -133,18 +132,11 @@ class PKL_REST_API_Auth
 	/**
 	 * Check if API key authentication is provided
 	 */
-	private function check_api_key_auth()
-	{
+	private function check_api_key_auth() {
 		$api_key = '';
 
-		if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['api_key'])) {
-			if (isset($_POST['_wpnonce']) && !wp_verify_nonce($_POST['_wpnonce'], 'api_key_auth')) {
-				return new WP_Error('invalid_nonce', 'Security check failed', array('status' => 403));
-			}
-			$api_key = sanitize_text_field(wp_unslash($_POST['api_key']));
-		}
-
 		// Method 1: Check in form-data
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- This is for API authentication, not form processing
 		if (isset($_POST['api_key']) && !empty($_POST['api_key'])) {
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.NonceVerification.Missing
 			$api_key = sanitize_text_field(wp_unslash($_POST['api_key']));
@@ -159,16 +151,17 @@ class PKL_REST_API_Auth
 					$api_key = sanitize_text_field($headers['X-API-Key']);
 				} elseif (isset($headers['x-api-key'])) {
 					$api_key = sanitize_text_field($headers['x-api-key']);
-				} // Method 4: Authorization Bearer header
+				}
+				// Method 4: Authorization Bearer header
 				elseif (isset($headers['Authorization'])) {
 					$auth_header = $headers['Authorization'];
 					if (strpos($auth_header, 'Bearer ') === 0) {
-						$api_key = sanitize_text_field(substr($auth_header, 7));
+						$api_key = sanitize_text_field(substr($auth_header, 7)); // Remove "Bearer " prefix
 					}
 				} elseif (isset($headers['authorization'])) {
 					$auth_header = $headers['authorization'];
 					if (strpos($auth_header, 'Bearer ') === 0) {
-						$api_key = sanitize_text_field(substr($auth_header, 7));
+						$api_key = sanitize_text_field(substr($auth_header, 7)); // Remove "Bearer " prefix
 					}
 				}
 			}
@@ -194,8 +187,7 @@ class PKL_REST_API_Auth
 	/**
 	 * Restrict REST API access
 	 */
-	public function restrict_rest_api($result)
-	{
+	public function restrict_rest_api($result) {
 		// If authentication has already failed, return the error
 		if (is_wp_error($result)) {
 			return $result;
@@ -238,8 +230,7 @@ class PKL_REST_API_Auth
 	/**
 	 * Plugin activation
 	 */
-	public function activate()
-	{
+	public function activate() {
 		// Create database tables
 		$this->database->create_tables();
 
@@ -253,8 +244,7 @@ class PKL_REST_API_Auth
 	/**
 	 * Plugin deactivation
 	 */
-	public function deactivate()
-	{
+	public function deactivate() {
 		// Flush rewrite rules
 		flush_rewrite_rules();
 	}
@@ -263,8 +253,7 @@ class PKL_REST_API_Auth
 /**
  * Initialize the plugin
  */
-function pkl_rest_api_auth()
-{
+function pkl_rest_api_auth() {
 	return PKL_REST_API_Auth::get_instance();
 }
 
