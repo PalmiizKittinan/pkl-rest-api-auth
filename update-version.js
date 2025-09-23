@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const phpFileName = 'pkl-rest-api-auth.php';
+const phpFileName = 'pkl-api-auth.php';
 const newVersion = process.env.TAG_VERSION;
 
 if (!newVersion) {
