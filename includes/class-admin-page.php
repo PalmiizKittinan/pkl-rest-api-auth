@@ -173,6 +173,10 @@ class PKL_REST_API_Auth_Admin_Page
 
 	    // Show messages
 	    if (isset($_GET['message'])) {
+            if (!wp_verify_nonce(wp_create_nonce('pkl_admin_message'), 'pkl_admin_message')) {
+                wp_die('Security check failed');
+            }
+
 		    $message = sanitize_text_field(wp_unslash($_GET['message']));
 		    $class = 'notice-success';
 		    $text = '';
@@ -297,7 +301,7 @@ class PKL_REST_API_Auth_Admin_Page
                                     <span class="pkl-status-active"><?php esc_html_e('Active', 'pkl-rest-api-auth'); ?></span>
                                 <?php endif; ?>
                             </td>
-                            <td><?php echo esc_html(mysql2date(get_option('date_format') . ' ' . get_option('time_format'), $token['created_at'])); ?></td>
+                            <td><?php echo esc_html(mysql2date(get_option('date_format') . ' class-admin-page.php' . get_option('time_format'), $token['created_at'])); ?></td>
                             <td class="pkl-actions">
                                 <?php if ($token['revoked']): ?>
                                     <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="display: inline;">

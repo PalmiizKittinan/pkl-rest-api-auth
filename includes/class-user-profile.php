@@ -44,8 +44,42 @@ class PKL_REST_API_Auth_User_Profile
             return;
         }
 
+        // Enqueue CSS
+        wp_enqueue_style(
+                'pkl-rest-api-auth-profile',
+                PKL_REST_API_AUTH_PLUGIN_URL . 'assets/user-profile.css',
+                array(),
+                PKL_REST_API_AUTH_VERSION
+        );
+
+        // Enqueue jQuery
         wp_enqueue_script('jquery');
-        wp_add_inline_script('jquery', $this->get_profile_js());
+
+        // Create a separate script handle for better organization
+        wp_register_script(
+                'pkl-rest-api-auth-profile-js',
+                '', // empty URL for inline script
+                array('jquery'),
+                PKL_REST_API_AUTH_VERSION,
+                true
+        );
+        wp_enqueue_script('pkl-rest-api-auth-profile-js');
+
+        // Add inline script
+        wp_add_inline_script('pkl-rest-api-auth-profile-js', $this->get_profile_js());
+
+        // Localize script for AJAX (safer than inline nonce)
+        wp_localize_script('pkl-rest-api-auth-profile-js', 'pklApiAuth', array(
+                'ajaxurl' => admin_url('admin-ajax.php'),
+                'nonce' => wp_create_nonce('pkl_api_key_action'),
+                'strings' => array(
+                        'generating' => __('Generating...', 'pkl-rest-api-auth'),
+                        'generateBtn' => __('Generate New API Key', 'pkl-rest-api-auth'),
+                        'active' => __('Active', 'pkl-rest-api-auth'),
+                        'confirmRevoke' => __('Are you sure you want to revoke your API key? This will disable API access.', 'pkl-rest-api-auth'),
+                        'revoked' => __('Revoked', 'pkl-rest-api-auth')
+                )
+        ));
     }
 
     /**
@@ -54,62 +88,62 @@ class PKL_REST_API_Auth_User_Profile
     private function get_profile_js()
     {
         return "
-        jQuery(document).ready(function($) {
-            $('#pkl-generate-api-key').on('click', function(e) {
-                e.preventDefault();
-                var button = $(this);
-                var userId = button.data('user-id');
+            jQuery(document).ready(function($) {
+                $('#pkl-generate-api-key').on('click', function(e) {
+                    e.preventDefault();
+                    var button = $(this);
+                    var userId = button.data('user-id');
+                    
+                    button.prop('disabled', true).text(pklApiAuth.strings.generating);
+                    
+                    $.post(pklApiAuth.ajaxurl, {
+                        action: 'pkl_generate_api_key',
+                        user_id: userId,
+                        _wpnonce: pklApiAuth.nonce
+                    }, function(response) {
+                        if (response.success) {
+                            $('#pkl-api-key-display').text(response.data.api_key).show();
+                            $('#pkl-api-key-status').removeClass('pkl-status-revoked').addClass('pkl-status-active').text(pklApiAuth.strings.active);
+                            $('#pkl-revoke-api-key').show();
+                            alert(response.data.message);
+                        } else {
+                            alert(response.data);
+                        }
+                    }).always(function() {
+                        button.prop('disabled', false).text(pklApiAuth.strings.generateBtn);
+                    });
+                });
                 
-                button.prop('disabled', true).text('" . esc_js(__('Generating...', 'pkl-rest-api-auth')) . "');
-                
-                $.post(ajaxurl, {
-                    action: 'pkl_generate_api_key',
-                    user_id: userId,
-                    _wpnonce: '" . wp_create_nonce('pkl_api_key_action') . "'
-                }, function(response) {
-                    if (response.success) {
-                        $('#pkl-api-key-display').text(response.data.api_key).show();
-                        $('#pkl-api-key-status').removeClass('pkl-status-revoked').addClass('pkl-status-active').text('" . esc_js(__('Active', 'pkl-rest-api-auth')) . "');
-                        $('#pkl-revoke-api-key').show();
-                        alert(response.data.message);
-                    } else {
-                        alert(response.data);
+                $('#pkl-revoke-api-key').on('click', function(e) {
+                    e.preventDefault();
+                    
+                    if (!confirm(pklApiAuth.strings.confirmRevoke)) {
+                        return;
                     }
-                }).always(function() {
-                    button.prop('disabled', false).text('" . esc_js(__('Generate New API Key', 'pkl-rest-api-auth')) . "');
+                    
+                    var button = $(this);
+                    var userId = button.data('user-id');
+                    
+                    button.prop('disabled', true);
+                    
+                    $.post(pklApiAuth.ajaxurl, {
+                        action: 'pkl_revoke_api_key',
+                        user_id: userId,
+                        _wpnonce: pklApiAuth.nonce
+                    }, function(response) {
+                        if (response.success) {
+                            $('#pkl-api-key-status').removeClass('pkl-status-active').addClass('pkl-status-revoked').text(pklApiAuth.strings.revoked);
+                            button.hide();
+                            alert(response.data);
+                        } else {
+                            alert(response.data);
+                        }
+                    }).always(function() {
+                        button.prop('disabled', false);
+                    });
                 });
             });
-            
-            $('#pkl-revoke-api-key').on('click', function(e) {
-                e.preventDefault();
-                
-                if (!confirm('" . esc_js(__('Are you sure you want to revoke your API key? This will disable API access.', 'pkl-rest-api-auth')) . "')) {
-                    return;
-                }
-                
-                var button = $(this);
-                var userId = button.data('user-id');
-                
-                button.prop('disabled', true);
-                
-                $.post(ajaxurl, {
-                    action: 'pkl_revoke_api_key',
-                    user_id: userId,
-                    _wpnonce: '" . wp_create_nonce('pkl_api_key_action') . "'
-                }, function(response) {
-                    if (response.success) {
-                        $('#pkl-api-key-status').removeClass('pkl-status-active').addClass('pkl-status-revoked').text('" . esc_js(__('Revoked', 'pkl-rest-api-auth')) . "');
-                        button.hide();
-                        alert(response.data);
-                    } else {
-                        alert(response.data);
-                    }
-                }).always(function() {
-                    button.prop('disabled', false);
-                });
-            });
-        });
-        ";
+            ";
     }
 
     /**
@@ -147,7 +181,7 @@ class PKL_REST_API_Auth_User_Profile
                         </p>
                         <p>
                             <strong><?php esc_html_e('Created:', 'pkl-rest-api-auth'); ?></strong>
-                            <?php echo esc_html(mysql2date(get_option('date_format') . ' ' . get_option('time_format'), $api_key_data['created_at'])); ?>
+                            <?php echo esc_html(mysql2date(get_option('date_format') . ' class-user-profile.php' . get_option('time_format'), $api_key_data['created_at'])); ?>
                         </p>
                     <?php else: ?>
                         <p><em><?php esc_html_e('No API key generated yet.', 'pkl-rest-api-auth'); ?></em></p>
@@ -204,44 +238,6 @@ class PKL_REST_API_Auth_User_Profile
                 </td>
             </tr>
         </table>
-
-        <style>
-            .pkl-status-active {
-                color: #2e7d32;
-                font-weight: bold;
-            }
-
-            .pkl-status-revoked {
-                color: #c62828;
-                font-weight: bold;
-            }
-
-            #pkl-api-key-display {
-                background: #f8f9fa;
-                padding: 8px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                word-break: break-all;
-                display: block;
-                max-width: 500px;
-            }
-
-            .notice.inline {
-                padding: 12px;
-                margin: 5px 0 15px 0;
-                background: #fff;
-                border-left: 4px solid;
-                box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
-            }
-
-            .notice.notice-error.inline {
-                border-left-color: #dc3232;
-            }
-
-            .notice.notice-warning.inline {
-                border-left-color: #ffba00;
-            }
-        </style>
         <?php
     }
 
