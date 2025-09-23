@@ -64,26 +64,10 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: ⚙️ Setup and Validate
+      - name: ⚙️ Setup Git
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          
-          echo "🔍 Current state:"
-          git log --oneline -5
-          git status
-          
-          # Validate tagged commit has required files
-          required_files=("pkl-api-auth.php" "readme.txt")
-          for file in "${required_files[@]}"; do
-            if [[ ! -f "$file" ]]; then
-              echo "❌ Required file missing in tag: $file"
-              exit 1
-            fi
-            echo "✅ Found: $file"
-          done
-          
-          echo "✅ All required files present in tagged commit"
 
       - name: 📝 Update Version Files (Stable Only)
         if: needs.validate.outputs.is-stable == 'true'
@@ -91,15 +75,19 @@ jobs:
           VERSION="${{ needs.validate.outputs.version }}"
           echo "🔄 Updating version to: $VERSION"
           
-          # Update version in pkl-api-auth.php
+          # Update version in pkl-api-auth.php (Version comment)
           if [[ -f "pkl-api-auth.php" ]]; then
-            if sed -i.bak "s/\(\* Version: \s*\).*/\1$VERSION/" pkl-api-auth.php; then
-              echo "✅ Updated version in pkl-api-auth.php"
-              cat pkl-api-auth.php | grep "Version:" | head -1
-            else
-              echo "❌ Failed to update pkl-api-auth.php"
-              exit 1
-            fi
+            sed -i "s/\* Version: .*/\* Version: $VERSION/" pkl-api-auth.php
+            echo "✅ Updated Version comment in pkl-api-auth.php"
+          
+            # Update PKL_REST_API_AUTH_VERSION constant
+            sed -i "s/define('PKL_REST_API_AUTH_VERSION', '[^']*');/define('PKL_REST_API_AUTH_VERSION', '$VERSION');/" pkl-api-auth.php
+            echo "✅ Updated PKL_REST_API_AUTH_VERSION constant"
+          
+            # Show changes
+            echo "📋 Updated lines:"
+            grep -n "Version:" pkl-api-auth.php | head -1
+            grep -n "PKL_REST_API_AUTH_VERSION" pkl-api-auth.php
           else
             echo "❌ pkl-api-auth.php not found"
             exit 1
@@ -107,39 +95,42 @@ jobs:
           
           # Update stable tag in readme.txt
           if [[ -f "readme.txt" ]] && grep -q "Stable tag:" readme.txt; then
-            if sed -i.bak "s/\(Stable tag: \s*\).*/\1$VERSION/" readme.txt; then
-              echo "✅ Updated stable tag in readme.txt"
-              cat readme.txt | grep "Stable tag:" | head -1
-            else
-              echo "❌ Failed to update readme.txt"
-              exit 1
-            fi
+            sed -i "s/Stable tag: .*/Stable tag: $VERSION/" readme.txt
+            echo "✅ Updated stable tag in readme.txt"
+            grep -n "Stable tag:" readme.txt
           else
             echo "⚠️ readme.txt not found or no stable tag found"
           fi
-          
-          # Clean up backup files
-          rm -f *.bak
-          
-          echo "📋 Changes made:"
-          git diff --name-only
-          git diff
 
-      - name: 💾 Create Version Commit (Stable Only)
+      - name: 💾 Commit and Push Version Update (Stable Only)
         if: needs.validate.outputs.is-stable == 'true'
         run: |
           if git diff --quiet; then
             echo "ℹ️ No changes to commit"
           else
-            # Create a new branch for the version update
-            BRANCH_NAME="release-v${{ needs.validate.outputs.version }}"
-            git checkout -b "$BRANCH_NAME"
+            # Checkout main branch
+            git checkout main
           
+            # Pull latest changes
+            git pull origin main
+          
+            # Apply version updates
+            VERSION="${{ needs.validate.outputs.version }}"
+          
+            # Update files again on main branch
+            sed -i "s/\* Version: .*/\* Version: $VERSION/" pkl-api-auth.php
+            sed -i "s/define('PKL_REST_API_AUTH_VERSION', '[^']*');/define('PKL_REST_API_AUTH_VERSION', '$VERSION');/" pkl-api-auth.php
+          
+            if [[ -f "readme.txt" ]]; then
+              sed -i "s/Stable tag: .*/Stable tag: $VERSION/" readme.txt
+            fi
+          
+            # Commit and push
             git add pkl-api-auth.php readme.txt
-            git commit -m "🔖 bump version to ${{ needs.validate.outputs.version }}"
+            git commit -m "🔖 Bump version to $VERSION"
+            git push origin main
           
-            echo "✅ Version files updated in branch $BRANCH_NAME"
-            echo "💡 Changes committed for release packaging"
+            echo "✅ Version updates pushed to main branch"
           fi
 
       - name: 📦 Create Distribution Package
@@ -175,10 +166,7 @@ jobs:
             --exclude='phpcs.xml*' \
             --exclude='phpunit.xml*' \
             --exclude='webpack.config.js' \
-            ./ "$DIST_DIR/" || {
-              echo "❌ Failed to copy files"
-              exit 1
-            }
+            ./ "$DIST_DIR/"
           
           cd "$TEMP_DIR"
           ZIP_FILE="${{ env.PLUGIN_NAME }}-${{ needs.validate.outputs.version }}.zip"
