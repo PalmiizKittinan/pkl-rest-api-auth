@@ -44,8 +44,14 @@ class PKL_REST_API_Auth_User_Profile
             return;
         }
 
+        wp_enqueue_style(
+                PKL_REST_API_AUTH_PLUGIN_URL . 'assets/user-profile.css',
+        );
+
         wp_enqueue_script('jquery');
-        wp_add_inline_script('jquery', $this->get_profile_js());
+        wp_enqueue_script('pkl-rest-api-auth-profile', '', array('jquery'), PKL_REST_API_AUTH_VERSION, true);
+        $js_code = $this->get_profile_js();
+        wp_add_inline_script('pkl-rest-api-auth-profile', $js_code);
     }
 
     /**
@@ -204,44 +210,6 @@ class PKL_REST_API_Auth_User_Profile
                 </td>
             </tr>
         </table>
-
-        <style>
-            .pkl-status-active {
-                color: #2e7d32;
-                font-weight: bold;
-            }
-
-            .pkl-status-revoked {
-                color: #c62828;
-                font-weight: bold;
-            }
-
-            #pkl-api-key-display {
-                background: #f8f9fa;
-                padding: 8px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                word-break: break-all;
-                display: block;
-                max-width: 500px;
-            }
-
-            .notice.inline {
-                padding: 12px;
-                margin: 5px 0 15px 0;
-                background: #fff;
-                border-left: 4px solid;
-                box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
-            }
-
-            .notice.notice-error.inline {
-                border-left-color: #dc3232;
-            }
-
-            .notice.notice-warning.inline {
-                border-left-color: #ffba00;
-            }
-        </style>
         <?php
     }
 
