@@ -45,7 +45,11 @@ class PKL_REST_API_Auth_User_Profile
         }
 
         wp_enqueue_style(
-                PKL_REST_API_AUTH_PLUGIN_URL . 'assets/user-profile.css',
+                'pkl-rest-api-auth-profile', // handle name
+                PKL_REST_API_AUTH_PLUGIN_URL . 'assets/user-profile.css', // URL to CSS file
+                array(), // dependencies
+                PKL_REST_API_AUTH_VERSION, // version
+                'all' // media
         );
 
         wp_enqueue_script('jquery');
