@@ -95,6 +95,12 @@ Major security update. OAuth endpoints removed. Please generate API keys through
 = 2.2.0 =
 Patch security update. Add Bearer token method
 
+= 2.2.2 =
+Patch security update
+
+= 2.2.3 =
+Patch security update
+
 == Developer Documentation ==
 
 For detailed API documentation and examples, visit the plugin settings page in your WordPress admin.
