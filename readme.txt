@@ -103,6 +103,12 @@ Patch security update
 Minor bug fixes
 Recoding for wordpress.org template
 
+= 2.3.1 =
+Bug Fixes
+
+= 2.3.2 =
+Bug Fixes
+
 == Developer Documentation ==
 
 For detailed API documentation and examples, visit the plugin settings page in your WordPress admin.
