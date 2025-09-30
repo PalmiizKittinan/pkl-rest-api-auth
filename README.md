@@ -150,6 +150,23 @@ JSON Body:
 
 ---
 
+# 📜 PHPStorm Git Worktree Script for Windows PowerShell
+### ⚙️ PowerShell Execution Policy Setting
+```bash
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+- ### Create Worktree
+```text
+.\phps-create-worktree.ps1 "dev/2.4.0"
+.\phps-create-worktree.ps1 "feature/user-auth" "develop"
+```
+- ### Remove Worktree
+```text
+.\phps-remove-worktree.ps1 "dev-2-4-0"
+```
+
+---
+
 ## 👨‍💻 Author
 - GitHub: [@PalmiizKittinan](https://github.com/PalmiizKittinan)
 - Plugin URI: [https://github.com/PalmiizKittinan/pkl-rest-api-auth](https://github.com/PalmiizKittinan/pkl-rest-api-auth)
