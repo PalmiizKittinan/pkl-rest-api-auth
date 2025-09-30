@@ -74,6 +74,16 @@ class PKL_REST_API_Auth_Admin_Page {
 				'default'           => 1
 			)
 		);
+
+        register_setting(
+            'pkl_rest_api_auth',
+            'pkl_rest_api_auth_allow_root_endpoint',
+            array(
+                'sanitize_callback' => array( $this, 'sanitize_checkbox' ),
+                'default'           => 0
+            )
+        );
+
 	}
 
 	/**
@@ -228,25 +238,39 @@ class PKL_REST_API_Auth_Admin_Page {
 	private function render_settings_tab() {
 		?>
         <form action="options.php" method="post">
-			<?php
-			settings_fields( 'pkl_rest_api_auth' );
-			?>
+            <?php
+            settings_fields( 'pkl_rest_api_auth' );
+            ?>
             <table class="form-table">
                 <tr>
                     <th scope="row"><?php esc_html_e( 'Enable REST API Authentication', 'pkl-rest-api-auth' ); ?></th>
                     <td>
-						<?php $enable = get_option( 'pkl_rest_api_auth_enable', 1 ); ?>
+                        <?php $enable = get_option( 'pkl_rest_api_auth_enable', 1 ); ?>
                         <label>
                             <input type="checkbox" name="pkl_rest_api_auth_enable" value="1" <?php checked( 1, $enable ); ?> />
-							<?php esc_html_e( 'Require authentication for REST API access', 'pkl-rest-api-auth' ); ?>
+                            <?php esc_html_e( 'Require authentication for REST API access', 'pkl-rest-api-auth' ); ?>
                         </label>
                         <p class="description">
-							<?php esc_html_e( 'When enabled, only authenticated users can access the WordPress REST API.', 'pkl-rest-api-auth' ); ?>
+                            <?php esc_html_e( 'When enabled, only authenticated users can access the WordPress REST API.', 'pkl-rest-api-auth' ); ?>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th scope="row"><?php esc_html_e( 'Allow /wp-json/ REST API Endpoint', 'pkl-rest-api-auth' ); ?></th>
+                    <td>
+                        <?php $allow_root = get_option( 'pkl_rest_api_auth_allow_root_endpoint', 0 ); ?>
+                        <label>
+                            <input type="checkbox" name="pkl_rest_api_auth_allow_root_endpoint" value="1" <?php checked( 1, $allow_root ); ?> />
+                            <?php esc_html_e( 'Allow public access to GET /wp-json/ endpoint only', 'pkl-rest-api-auth' ); ?>
+                        </label>
+                        <p class="description">
+                            <?php esc_html_e( 'When enabled, GET requests to /wp-json/ (root endpoint only) will not require authentication. All other endpoints will still require authentication.', 'pkl-rest-api-auth' ); ?>
                         </p>
                     </td>
                 </tr>
             </table>
-			<?php submit_button(); ?>
+            <?php submit_button(); ?>
         </form>
 		<?php
 	}

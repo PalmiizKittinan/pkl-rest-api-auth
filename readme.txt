@@ -4,7 +4,7 @@ Tags: rest-api, authentication, api-key, security, access-control
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 2.3.2
+Stable tag: 2.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -112,6 +112,10 @@ Bug Fixes
 = 2.3.3 =
 Bug Fixes
 * Datetime bug fixes
+
+= 2.4.0 =
+* Added Checked-box for Disable/Enable Root REST Api Endpoint (./wp-json) on admin page.
+* Some bug fixes.
 
 == Developer Documentation ==
 
