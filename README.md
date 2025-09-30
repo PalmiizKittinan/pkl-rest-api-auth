@@ -1,6 +1,5 @@
 # 🔐 PKL REST API Auth
-
-A WordPress plugin that controls REST API access by requiring user authentication with OAuth token system.
+![](https://img.shields.io/badge/Manual_Version%20-1.0.0%20-blue)<br>
 
 ---
 
