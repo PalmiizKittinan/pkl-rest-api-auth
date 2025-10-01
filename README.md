@@ -1,12 +1,14 @@
 # 🔐 PKL REST API Auth
+
 ![](https://img.shields.io/badge/Stable_Plugin_Version%20-v2.5.0%20-default)
-![](https://img.shields.io/badge/Manual_Version%20-1.1.0%20-blue)<br>
+![](https://img.shields.io/badge/Manual_Version%20-1.1.1%20-blue)<br>
 
 ---
 
 ## 📝 Description
 
-PKL REST API Auth provides secure authentication for WordPress REST API endpoints using access tokens. Only registered users can generate tokens and access the API, giving you complete control over who can interact with your WordPress site programmatically.
+PKL REST API Auth provides secure authentication for WordPress REST API endpoints using access tokens. Only registered users can generate tokens and access the API, giving you complete control over who can interact with your
+WordPress site programmatically.
 
 ## ✨ Features
 
@@ -34,7 +36,9 @@ PKL REST API Auth provides secure authentication for WordPress REST API endpoint
 ## 🛠️ Configuration
 
 ### Plugin Settings
+
 Go to **Settings → PKL REST API Auth** to:
+
 - Enable/disable REST API authentication
 - View API usage guide
 - Manage access tokens
@@ -42,18 +46,20 @@ Go to **Settings → PKL REST API Auth** to:
 ## 📊 Admin Interface
 
 **The plugin provides three main tabs**
+
 1. **Settings** - Configure authentication requirements
-   - Enable/Disable REST API Authentication
+    - Enable/Disable REST API Authentication
 2. **Access Tokens** - Manage all user tokens
-   - View all generated tokens
-   - Revoke tokens (disable access)
-   - Restore revoked tokens
-   - Delete tokens permanently
+    - View all generated tokens
+    - Revoke tokens (disable access)
+    - Restore revoked tokens
+    - Delete tokens permanently
 3. **API Guide** - Complete usage documentation
 
 ---
 
 # 🎯 REST API Quick Start Guide
+
 ## 📋 Authentication Method Comparison
 
 | Method              | Security | Use Case      | Pros                  | Cons          |
@@ -64,13 +70,16 @@ Go to **Settings → PKL REST API Auth** to:
 | **Query Parameter** | 🚫 Low   | Development   | Simple                | Security risk |
 
 ### Example
+
 #### ✅ Method 1: Authorization Bearer (Recommended for Production)
+
 ```text
 GET /wp-json/wp/v2/posts
 Authorization:Bearer pkl_abcd1234...
 ```
 
 #### 🚀 Method 2: Form-data (Recommended for Testing)
+
 ```text
 POST /wp-json/wp/v2/posts
 Content-Type: multipart/form-data
@@ -82,17 +91,20 @@ status: draft
 ```
 
 #### Method 3: Custom Header
+
 ```text
 GET /wp-json/wp/v2/posts
 X-API-Key: pkl_abcd1234...
 ```
 
 #### 🚨 Method 4: Query Parameter (Development Only)
+
 ```text
 GET /wp-json/wp/v2/posts?api_key=pkl_abcd1234...
 ```
 
 # 🌐 API Reference
+
 > Use `<your_api_key>` for authenticating all API requests.
 
 ## 📖 API Usage Guide
@@ -127,19 +139,23 @@ GET /wp-json/wp/v2/posts?api_key=pkl_abcd1234...
   ```
 
 ### 🎯 Example: JSON Request Body
+
 #### Method: POST | `https://<your-wordpress-url>/wp-json/wp/v2/posts`
 
 Authorization Header:
+
 ```text
 Authorization: Bearer <your_api_key>
 ```
 
 Request Header:
+
 ```text
 Content-Type: application/json
 ```
 
 JSON Body:
+
 ```json
 {
   "title": "Lorem Ipsum",
@@ -151,7 +167,9 @@ JSON Body:
 ---
 
 # 📜 PHPStorm Git Worktree Script for Windows PowerShell
+
 ## ⚙️ PowerShell Execution Policy Setting
+
 ```text
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
@@ -159,6 +177,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ## 💻 Example Development Flows
 
 ### 1. Create Worktree Development Branch
+
 - Create Worktree
     ```text
     .\phps-create-worktree.ps1 "dev/2.4.0"   
@@ -167,29 +186,33 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 - Open Your Worktree Project with PHPStorm
 
 ### 2. Merge and Cleanup Worktree
+
 ```text
 .\phps-merge-and-cleanup.ps1 "dev-2-4-0"
 ```
+
 ### 3. Created Git Tag After Merge Finished
+
 ```text
 # Create Git Tag
 git tag -a "v2.4.0" -m "Updated Minor Version" 
 
-#Push Git Tag
+# Push Git Tag
 git push origin v2.4.0
 ```
+
 ### 4. Remove Worktree
+
 ```text
 .\phps-remove-worktree.ps1 "dev-2-4-0"
 ```
 
-
 ---
 
 ## 👨‍💻 Author
+
 - GitHub: [@PalmiizKittinan](https://github.com/PalmiizKittinan)
 - Plugin URI: [https://github.com/PalmiizKittinan/pkl-rest-api-auth](https://github.com/PalmiizKittinan/pkl-rest-api-auth)
-
 
 ## 📄 License
 

@@ -200,26 +200,25 @@ class PKL_REST_API_Auth {
 		// Get the REST route
 		$rest_route = $GLOBALS['wp']->query_vars['rest_route'] ?? '';
 
-		// Check root endpoint
-		if ( $allow_root ) {
-			$method = isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : '';
+		// Get HTTP method
+		$method = isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
 
-			if ( $method === 'GET' ) {
-				if ( empty( $rest_route ) || $rest_route === '/' || $rest_route === '' ) {
-					return null;
-				}
+		// Check root endpoint - Allow GET only
+		if ( $allow_root && $method === 'GET' ) {
+			if ( empty( $rest_route ) || $rest_route === '/' || $rest_route === '' ) {
+				return null;
 			}
 		}
 
-		// Check if pages endpoint is allowed
-		if ( $allow_pages ) {
+		// Check if pages endpoint is allowed - Allow GET only
+		if ( $allow_pages && $method === 'GET' ) {
 			if ( strpos( $rest_route, '/wp/v2/pages' ) === 0 ) {
 				return null;
 			}
 		}
 
-		// Check if posts endpoint is allowed
-		if ( $allow_posts ) {
+		// Check if posts endpoint is allowed - Allow GET only
+		if ( $allow_posts && $method === 'GET' ) {
 			if ( strpos( $rest_route, '/wp/v2/posts' ) === 0 ) {
 				return null;
 			}
