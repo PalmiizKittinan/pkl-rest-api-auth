@@ -73,73 +73,53 @@ jobs:
         if: needs.validate.outputs.is-stable == 'true'
         run: |
           VERSION="${{ needs.validate.outputs.version }}"
-          echo "🔄 Updating version to: $VERSION"
-          
-          # Update version in pkl-api-auth.php (Version comment)
-          if [[ -f "pkl-api-auth.php" ]]; then
-            sed -i "s/\* Version: .*/\* Version: $VERSION/" pkl-api-auth.php
-            echo "✅ Updated Version comment in pkl-api-auth.php"
-          
-            # Update PKL_REST_API_AUTH_VERSION constant
-            sed -i "s/define('PKL_REST_API_AUTH_VERSION', '[^']*');/define('PKL_REST_API_AUTH_VERSION', '$VERSION');/" pkl-api-auth.php
-            echo "✅ Updated PKL_REST_API_AUTH_VERSION constant"
-          
-            # Show changes
-            echo "📋 Updated lines:"
-            grep -n "Version:" pkl-api-auth.php | head -1
-            grep -n "PKL_REST_API_AUTH_VERSION" pkl-api-auth.php
-          else
-            echo "❌ pkl-api-auth.php not found"
-            exit 1
-          fi
-          
-          # Update stable tag in readme.txt
-          if [[ -f "readme.txt" ]] && grep -q "Stable tag:" readme.txt; then
-            sed -i "s/Stable tag: .*/Stable tag: $VERSION/" readme.txt
-            echo "✅ Updated stable tag in readme.txt"
-            grep -n "Stable tag:" readme.txt
-          else
-            echo "⚠️ readme.txt not found or no stable tag found"
-          fi      
+          echo "🔄 Preparing version update to: $VERSION"
 
       - name: 💾 Commit and Push Version Update (Stable Only)
         if: needs.validate.outputs.is-stable == 'true'
         run: |
+          VERSION="${{ needs.validate.outputs.version }}"
+
+          # Checkout main branch
+          echo "📌 Switching to main branch..."
+          git checkout main
+
+          # Pull latest changes
+          echo "⬇️ Pulling latest changes..."
+          git pull origin main
+
+          # Update all version files
+          echo "🔄 Updating version to: $VERSION"
+
+          # Update pkl-api-auth.php
+          sed -i "s/\* Version: .*/\* Version: $VERSION/" pkl-api-auth.php
+          sed -i "s/define('PKL_REST_API_AUTH_VERSION', '[^']*');/define('PKL_REST_API_AUTH_VERSION', '$VERSION');/" pkl-api-auth.php
+
+          # Update readme.txt
+          if [[ -f "readme.txt" ]]; then
+            sed -i "s/Stable tag: .*/Stable tag: $VERSION/" readme.txt
+          fi
+
+          # Update README.md badge
+          if [[ -f "README.md" ]]; then
+            sed -i "s/Stable_Plugin_Version%20-v[^%]*/Stable_Plugin_Version%20-v$VERSION/" README.md
+            echo "✅ Updated README.md badge"
+          fi
+
+          # Show what changed
+          echo "📋 Changed files:"
+          git diff --name-only
+
+          # Check if there are changes
           if git diff --quiet; then
             echo "ℹ️ No changes to commit"
           else
-            # Checkout main branch
-            git checkout main
-          
-            # Pull latest changes
-            git pull origin main
-          
-            # Apply version updates
-            VERSION="${{ needs.validate.outputs.version }}"
-          
-            # Update files again on main branch
-            sed -i "s/\* Version: .*/\* Version: $VERSION/" pkl-api-auth.php
-            sed -i "s/define('PKL_REST_API_AUTH_VERSION', '[^']*');/define('PKL_REST_API_AUTH_VERSION', '$VERSION');/" pkl-api-auth.php
-          
-            if [[ -f "readme.txt" ]]; then
-              sed -i "s/Stable tag: .*/Stable tag: $VERSION/" readme.txt
-            fi
-          
-            # Update version badge in README.md
-            if [[ -f "README.md" ]]; then
-              sed -i "s/Stable_Plugin_Version%20-v[^%]*/Stable_Plugin_Version%20-v$VERSION/" README.md
-              echo "✅ Updated version badge in README.md"
-              grep -n "Stable_Plugin_Version" README.md
-              else
-              echo "⚠️ README.md not found"
-            fi
-          
             # Commit and push
             git add pkl-api-auth.php readme.txt README.md
-            git commit -m "🔖 Bump version to $VERSION"
+            git commit -m "🔖 Bump version to $VERSION [skip ci]"
             git push origin main
-          
-            echo "✅ Version updates pushed to main branch"
+
+            echo "✅ Version $VERSION pushed to main branch"
           fi
         
 
