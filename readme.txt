@@ -81,8 +81,8 @@ You can enable/disable access to the wp-json root endpoint (./wp-json) from the 
 == Upgrade Notice ==
 
 = 2.5.0 =
-* Added: Checkbox to disable/enable root REST API endpoint (./wp-json/wp/v2/posts) on admin page
-* Added: Checkbox to disable/enable root REST API endpoint (./wp-json/wp/v2/pages) on admin page
+* Added: Checkbox to disable/enable root REST API endpoint (./wp-json/wp/v2/posts) on admin page : Default is Enable
+* Added: Checkbox to disable/enable root REST API endpoint (./wp-json/wp/v2/pages) on admin page : Default is Enable
 
 = 2.4.0 =
 New feature: Control root REST API endpoint access. Added checkbox to disable/enable wp-json endpoint. Bug fixes included.
@@ -99,8 +99,8 @@ Security patch with Bearer token support added. Update recommended for enhanced 
 == Changelog ==
 
 = 2.5.0 =
-* Added: Checkbox to disable/enable root REST API endpoint (./wp-json/wp/v2/posts) on admin page
-* Added: Checkbox to disable/enable root REST API endpoint (./wp-json/wp/v2/pages) on admin page
+* Added: Checkbox to disable/enable root REST API endpoint (./wp-json/wp/v2/posts) on admin page : Default is Enable
+* Added: Checkbox to disable/enable root REST API endpoint (./wp-json/wp/v2/pages) on admin page : Default is Enable
 
 = 2.4.0 =
 * Added: Checkbox to disable/enable root REST API endpoint (./wp-json) on admin page
