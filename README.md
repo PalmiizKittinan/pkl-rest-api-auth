@@ -158,17 +158,17 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ## 💻 Example Development Flows
 
-### 1. 🚀 Create Worktree
+### 1. Create Worktree
 ```text
 .\phps-create-worktree.ps1 "dev/2.4.0"
 .\phps-create-worktree.ps1 "feature/user-auth" "develop"
 ```
 
-### 2. 🔄 Merge and Cleanup Worktree
+### 2. Merge and Cleanup Worktree
 ```text
 .\phps-merge-and-cleanup.ps1 "dev-2-4-0"
 ```
-### 3. 📑 Created Git Tag After Merge Finished
+### 3. Created Git Tag After Merge Finished
 ```text
 # Create Git Tag
 git tag -a "v2.4.0" -m "Updated Minor Version" 
@@ -176,7 +176,7 @@ git tag -a "v2.4.0" -m "Updated Minor Version"
 #Push Git Tag
 git push origin v2.4.0
 ```
-### 4. 🗑️ Remove Worktree
+### 4. Remove Worktree
 ```text
 .\phps-remove-worktree.ps1 "dev-2-4-0"
 ```
