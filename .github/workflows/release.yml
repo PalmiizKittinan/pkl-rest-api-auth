@@ -57,6 +57,7 @@ jobs:
     needs: validate
     permissions:
       contents: write
+
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
@@ -69,59 +70,75 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
-      - name: 📝 Update Version Files (Stable Only)
+      - name: 💾 Update and Commit Version (Stable Only)
         if: needs.validate.outputs.is-stable == 'true'
         run: |
           VERSION="${{ needs.validate.outputs.version }}"
-          echo "🔄 Preparing version update to: $VERSION"
-
-      - name: 💾 Commit and Push Version Update (Stable Only)
-        if: needs.validate.outputs.is-stable == 'true'
-        run: |
-          VERSION="${{ needs.validate.outputs.version }}"
-
+          
           # Checkout main branch
           echo "📌 Switching to main branch..."
           git checkout main
-
+          
           # Pull latest changes
           echo "⬇️ Pulling latest changes..."
           git pull origin main
-
+          
           # Update all version files
           echo "🔄 Updating version to: $VERSION"
-
-          # Update pkl-api-auth.php
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          # 1. Update pkl-api-auth.php (Version comment)
           sed -i "s/\* Version: .*/\* Version: $VERSION/" pkl-api-auth.php
-          sed -i "s/define('PKL_REST_API_AUTH_VERSION', '[^']*');/define('PKL_REST_API_AUTH_VERSION', '$VERSION');/" pkl-api-auth.php
-
-          # Update readme.txt
+          echo "✅ Updated Version comment"
+          
+          # 2. Update PKL_REST_API_AUTH_VERSION constant
+          sed -i "s/define([[:space:]]*'PKL_REST_API_AUTH_VERSION'[[:space:]]*,[[:space:]]*'[^']*'[[:space:]]*);/define( 'PKL_REST_API_AUTH_VERSION', '$VERSION' );/" pkl-api-auth.php
+          echo "✅ Updated PKL_REST_API_AUTH_VERSION constant"
+          
+          # 3. Update readme.txt
           if [[ -f "readme.txt" ]]; then
             sed -i "s/Stable tag: .*/Stable tag: $VERSION/" readme.txt
+            echo "✅ Updated readme.txt"
           fi
-
-          # Update README.md badge
+          
+          # 4. Update README.md badge
           if [[ -f "README.md" ]]; then
             sed -i "s/Stable_Plugin_Version%20-v[^%]*/Stable_Plugin_Version%20-v$VERSION/" README.md
             echo "✅ Updated README.md badge"
           fi
-
-          # Show what changed
-          echo "📋 Changed files:"
-          git diff --name-only
-
+          
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          # Show updated lines
+          echo "📋 Updated lines in pkl-api-auth.php:"
+          grep -n "Version:" pkl-api-auth.php | head -1
+          grep -n "PKL_REST_API_AUTH_VERSION" pkl-api-auth.php
+          
+          if [[ -f "readme.txt" ]]; then
+            echo ""
+            echo "📋 Updated line in readme.txt:"
+            grep -n "Stable tag:" readme.txt
+          fi
+          
+          if [[ -f "README.md" ]]; then
+            echo ""
+            echo "📋 Updated badge in README.md:"
+            grep "Stable_Plugin_Version" README.md
+          fi
+          
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
           # Check if there are changes
           if git diff --quiet; then
             echo "ℹ️ No changes to commit"
           else
-            # Commit and push
+            echo "📝 Committing changes..."
             git add pkl-api-auth.php readme.txt README.md
             git commit -m "🔖 Bump version to $VERSION [skip ci]"
             git push origin main
-
+          
             echo "✅ Version $VERSION pushed to main branch"
           fi
-
 
       - name: 📦 Create Distribution Package
         run: |
@@ -145,17 +162,11 @@ jobs:
             --exclude='*.lock' \
             --exclude='*.log' \
             --exclude='*.tmp' \
+            --exclude='*.ps1' \
             --exclude='update-version.js' \
             --exclude='composer.*' \
             --exclude='package*' \
             --exclude='yarn.lock' \
-            --exclude='.distignore' \
-            --exclude='.editorconfig' \
-            --exclude='.eslintrc*' \
-            --exclude='.prettierrc*' \
-            --exclude='phpcs.xml*' \
-            --exclude='phpunit.xml*' \
-            --exclude='webpack.config.js' \
             ./ "$DIST_DIR/"
           
           cd "$TEMP_DIR"
@@ -166,7 +177,8 @@ jobs:
           
           echo "📊 Package Information:"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          ls -la "$GITHUB_WORKSPACE/$ZIP_FILE"
+          ls -lh "$GITHUB_WORKSPACE/$ZIP_FILE"
+          echo ""
           echo "Package contents:"
           unzip -l "$GITHUB_WORKSPACE/$ZIP_FILE" | head -20
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -218,9 +230,10 @@ jobs:
           ### 📥 Installation
           1. Download the plugin zip file below
           2. Upload to your WordPress site via Admin → Plugins → Add New → Upload
-          3. Activate the plugin          
+          3. Activate the plugin
+          
           ---
-          *This document was automatically generated by GitHub Actions*
+          *This release was automatically generated by GitHub Actions*
           EOF
 
       - name: 🎉 Create GitHub Release
@@ -238,6 +251,9 @@ jobs:
 
       - name: ✅ Release Summary
         run: |
-          echo "🎉 v${{ needs.validate.outputs.version }} created successfully!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎉 Release v${{ needs.validate.outputs.version }} created successfully!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           echo "📦 Package: ${{ env.PLUGIN_NAME }}-${{ needs.validate.outputs.version }}.zip"
           echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/v${{ needs.validate.outputs.version }}"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
