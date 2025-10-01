@@ -1,4 +1,5 @@
 # 🔐 PKL REST API Auth
+![](https://img.shields.io/badge/Stable_Plugin_Version%20-v2.4.0%20-default)
 ![](https://img.shields.io/badge/Manual_Version%20-1.0.0%20-blue)<br>
 
 ---
