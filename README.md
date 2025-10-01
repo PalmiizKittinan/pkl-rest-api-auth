@@ -152,17 +152,19 @@ JSON Body:
 
 # 📜 PHPStorm Git Worktree Script for Windows PowerShell
 ## ⚙️ PowerShell Execution Policy Setting
-```bash
+```text
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 ## 💻 Example Development Flows
 
-### 1. Create Worktree
-```text
-.\phps-create-worktree.ps1 "dev/2.4.0"
-.\phps-create-worktree.ps1 "feature/user-auth" "develop"
-```
+### 1. Create Worktree Development Branch
+- Create Worktree
+    ```text
+    .\phps-create-worktree.ps1 "dev/2.4.0"   
+    .\phps-create-worktree.ps1 "feature/user-auth" "develop"
+    ```
+- Open Your Worktree Project with PHPStorm
 
 ### 2. Merge and Cleanup Worktree
 ```text
