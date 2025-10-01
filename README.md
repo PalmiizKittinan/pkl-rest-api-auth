@@ -1,6 +1,6 @@
 # 🔐 PKL REST API Auth
 ![](https://img.shields.io/badge/Stable_Plugin_Version%20-v2.5.0%20-default)
-![](https://img.shields.io/badge/Manual_Version%20-1.0.0%20-blue)<br>
+![](https://img.shields.io/badge/Manual_Version%20-1.1.0%20-blue)<br>
 
 ---
 
@@ -151,22 +151,36 @@ JSON Body:
 ---
 
 # 📜 PHPStorm Git Worktree Script for Windows PowerShell
-### ⚙️ PowerShell Execution Policy Setting
+## ⚙️ PowerShell Execution Policy Setting
 ```bash
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
-### Example
+## 💻 Example Development Flows
 
-- ### Create Worktree
+### 1. 🚀 Create Worktree
 ```text
 .\phps-create-worktree.ps1 "dev/2.4.0"
 .\phps-create-worktree.ps1 "feature/user-auth" "develop"
 ```
-- ### Remove Worktree
+
+### 2. 🔄 Merge and Cleanup Worktree
+```text
+.\phps-merge-and-cleanup.ps1 "dev-2-4-0"
+```
+### 3. 📑 Created Git Tag After Merge Finished
+```text
+# Create Git Tag
+git tag -a "v2.4.0" -m "Updated Minor Version" 
+
+#Push Git Tag
+git push origin v2.4.0
+```
+### 4. 🗑️ Remove Worktree
 ```text
 .\phps-remove-worktree.ps1 "dev-2-4-0"
 ```
+
 
 ---
 
