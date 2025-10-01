@@ -89,7 +89,7 @@ class PKL_REST_API_Auth_Admin_Page {
                 'pkl_rest_api_auth_allow_pages',
                 array(
                         'sanitize_callback' => array( $this, 'sanitize_checkbox' ),
-                        'default'           => 0
+                        'default'           => 1
                 )
         );
 
@@ -98,7 +98,7 @@ class PKL_REST_API_Auth_Admin_Page {
                 'pkl_rest_api_auth_allow_posts',
                 array(
                         'sanitize_callback' => array( $this, 'sanitize_checkbox' ),
-                        'default'           => 0
+                        'default'           => 1
                 )
         );
 
@@ -291,7 +291,7 @@ class PKL_REST_API_Auth_Admin_Page {
                 <tr>
                     <th scope="row"><?php esc_html_e( 'Allow /wp-json/wp/v2/pages Endpoint', 'pkl-rest-api-auth' ); ?></th>
                     <td>
-                        <?php $allow_pages = get_option( 'pkl_rest_api_auth_allow_pages', 0 ); ?>
+                        <?php $allow_pages = get_option( 'pkl_rest_api_auth_allow_pages', 1 ); ?>
                         <label>
                             <input type="checkbox" name="pkl_rest_api_auth_allow_pages" value="1" <?php checked( 1, $allow_pages ); ?> />
                             <?php esc_html_e( 'Allow public access to /wp-json/wp/v2/pages endpoint without authentication', 'pkl-rest-api-auth' ); ?>
@@ -305,7 +305,7 @@ class PKL_REST_API_Auth_Admin_Page {
                 <tr>
                     <th scope="row"><?php esc_html_e( 'Allow /wp-json/wp/v2/posts Endpoint', 'pkl-rest-api-auth' ); ?></th>
                     <td>
-                        <?php $allow_posts = get_option( 'pkl_rest_api_auth_allow_posts', 0 ); ?>
+                        <?php $allow_posts = get_option( 'pkl_rest_api_auth_allow_posts',1); ?>
                         <label>
                             <input type="checkbox" name="pkl_rest_api_auth_allow_posts" value="1" <?php checked( 1, $allow_posts ); ?> />
                             <?php esc_html_e( 'Allow public access to /wp-json/wp/v2/posts endpoint without authentication', 'pkl-rest-api-auth' ); ?>
