@@ -98,6 +98,11 @@ Security patch with Bearer token support added. Update recommended for enhanced 
 
 == Changelog ==
 
+= 2.5.1 =
+* Bug Fixes
+** Allow only method GET for REST API endpoint (./wp-json/wp/v2/posts)
+** Allow only method GET for REST API endpoint (./wp-json/wp/v2/pages)
+
 = 2.5.0 =
 * Added: Checkbox to disable/enable root REST API endpoint (./wp-json/wp/v2/posts) on admin page : Default is Enable
 * Added: Checkbox to disable/enable root REST API endpoint (./wp-json/wp/v2/pages) on admin page : Default is Enable
