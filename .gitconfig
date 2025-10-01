@@ -1,0 +1,5 @@
+[alias]
+    tags = tag -l --sort=-version:refname
+    tagsv = tag -n --sort=-version:refname
+    tagsd = git for-each-ref --sort=-creatordate --format '%(color:yellow)%(refname:short)%(color:reset) - %(color:green)%(creatordate:relative)%(color:reset) - %(contents:subject)' refs/tags
+    lasttag = describe --tags --abbrev=0
