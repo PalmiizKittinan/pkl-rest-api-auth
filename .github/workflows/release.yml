@@ -105,40 +105,42 @@ jobs:
       - name: 💾 Commit and Push Version Update (Stable Only)
         if: needs.validate.outputs.is-stable == 'true'
         run: |
-          if git diff --quiet; then
-            echo "ℹ️ No changes to commit"
-          else
-            # Checkout main branch
-            git checkout main
+          VERSION="${{ needs.validate.outputs.version }}"
+          echo "🔄 Updating version to: $VERSION"
           
-            # Pull latest changes
-            git pull origin main
-          
-            # Apply version updates
-            VERSION="${{ needs.validate.outputs.version }}"
-          
-            # Update files again on main branch
+          # Update version in pkl-api-auth.php (Version comment)
+          if [[ -f "pkl-api-auth.php" ]]; then
             sed -i "s/\* Version: .*/\* Version: $VERSION/" pkl-api-auth.php
+            echo "✅ Updated Version comment in pkl-api-auth.php"
+          
+            # Update PKL_REST_API_AUTH_VERSION constant
             sed -i "s/define('PKL_REST_API_AUTH_VERSION', '[^']*');/define('PKL_REST_API_AUTH_VERSION', '$VERSION');/" pkl-api-auth.php
+            echo "✅ Updated PKL_REST_API_AUTH_VERSION constant"
           
-            if [[ -f "readme.txt" ]]; then
-              sed -i "s/Stable tag: .*/Stable tag: $VERSION/" readme.txt
-            fi
+            # Show changes
+            echo "📋 Updated lines:"
+            grep -n "Version:" pkl-api-auth.php | head -1
+            grep -n "PKL_REST_API_AUTH_VERSION" pkl-api-auth.php
+          else
+            echo "❌ pkl-api-auth.php not found"
+            exit 1
+          fi
           
-            # Commit and push
-            git add pkl-api-auth.php readme.txt
-            git commit -m "🔖 Bump version to $VERSION"
-            git push origin main
-          
-            echo "✅ Version updates pushed to main branch"
+          # Update stable tag in readme.txt
+          if [[ -f "readme.txt" ]] && grep -q "Stable tag:" readme.txt; then
+            sed -i "s/Stable tag: .*/Stable tag: $VERSION/" readme.txt
+            echo "✅ Updated stable tag in readme.txt"
+            grep -n "Stable tag:" readme.txt
+          else
+            echo "⚠️ readme.txt not found or no stable tag found"
           fi
           
           # Update version badge in README.md
           if [[ -f "README.md" ]]; then
-            sed -i "s/Stable_Plugin_Version%20-v[^%]*/Stable_Plugin_Version%20-v$VERSION/" README.md
+            sed -i "s/Stable_Plugin_Version%20-v[0-9.]*%20/Stable_Plugin_Version%20-v$VERSION%20/" README.md
             echo "✅ Updated version badge in README.md"
             grep -n "Stable_Plugin_Version" README.md
-            else
+          else
             echo "⚠️ README.md not found"
           fi
 
