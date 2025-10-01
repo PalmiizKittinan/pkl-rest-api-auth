@@ -155,6 +155,9 @@ JSON Body:
 ```bash
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
+
+### Example
+
 - ### Create Worktree
 ```text
 .\phps-create-worktree.ps1 "dev/2.4.0"

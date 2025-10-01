@@ -29,20 +29,18 @@ try {
     git worktree add -b $BranchName $FolderPath $BaseBranch
 
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "✅ Worktree created successfully!" -ForegroundColor Green
-        Write-Host "📁 Location: $FolderPath" -ForegroundColor White
-        Write-Host "🌿 Branch: $BranchName" -ForegroundColor White
+        Write-Host "[SUCCESS] Worktree created successfully!" -ForegroundColor Green
+        Write-Host "Location: $FolderPath" -ForegroundColor White
+        Write-Host "Branch: $BranchName" -ForegroundColor White
 
-        # แสดงรายการ worktree ทั้งหมด
         Write-Host "`nCurrent worktrees:" -ForegroundColor Cyan
         git worktree list
 
         $openInPhpStorm = Read-Host "`nOpen in PHPStorm? (y/n)"
         if ($openInPhpStorm -eq 'y' -or $openInPhpStorm -eq 'Y') {
-            # ลองหา PHPStorm executable
             $phpStormPaths = @(
                 "${env:ProgramFiles}\JetBrains\PhpStorm*\bin\phpstorm64.exe",
-                "${env:LOCALAPPDATA}\JetBrains\PhpStorm*\bin\phpstorm64.exe",
+                "${env:LOCALAPPDATA}\JetBrains\Toolbox\apps\PhpStorm\ch-0\*\bin\phpstorm64.exe",
                 "${env:ProgramFiles(x86)}\JetBrains\PhpStorm*\bin\phpstorm64.exe"
             )
 
@@ -63,7 +61,7 @@ try {
             }
         }
     } else {
-        Write-Host "❌ Failed to create worktree!" -ForegroundColor Red
+        Write-Host "[FAILED] Failed to create worktree!" -ForegroundColor Red
         exit 1
     }
 } catch {
