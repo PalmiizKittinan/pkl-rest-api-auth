@@ -100,16 +100,7 @@ jobs:
             grep -n "Stable tag:" readme.txt
           else
             echo "⚠️ readme.txt not found or no stable tag found"
-          fi
-          
-          # Update version badge in README.md
-          if [[ -f "README.md" ]]; then
-          sed -i "s/Stable_Plugin_Version%20-v[^%]*/Stable_Plugin_Version%20-v$VERSION/" README.md
-          echo "✅ Updated version badge in README.md"
-          grep -n "Stable_Plugin_Version" README.md
-          else
-          echo "⚠️ README.md not found"
-          fi
+          fi      
 
       - name: 💾 Commit and Push Version Update (Stable Only)
         if: needs.validate.outputs.is-stable == 'true'
@@ -140,6 +131,15 @@ jobs:
             git push origin main
           
             echo "✅ Version updates pushed to main branch"
+          fi
+          
+          # Update version badge in README.md
+          if [[ -f "README.md" ]]; then
+            sed -i "s/Stable_Plugin_Version%20-v[^%]*/Stable_Plugin_Version%20-v$VERSION/" README.md
+            echo "✅ Updated version badge in README.md"
+            grep -n "Stable_Plugin_Version" README.md
+            else
+            echo "⚠️ README.md not found"
           fi
 
       - name: 📦 Create Distribution Package
