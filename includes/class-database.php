@@ -79,11 +79,13 @@ class PKL_WPZ_REST_API_Auth_Database
 
         // If column exists and is not using binary collation, update it
         if ($column_info && $column_info['COLLATION_NAME'] !== 'utf8mb4_bin') {
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-            $wpdb->query(
-                "ALTER TABLE {$this->table_name} 
-                MODIFY access_token varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL"
+            $alter_query = sprintf(
+                'ALTER TABLE %s MODIFY access_token varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL',
+                $this->table_name
             );
+
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.SchemaChange
+            $wpdb->query($alter_query);
         }
     }
 
