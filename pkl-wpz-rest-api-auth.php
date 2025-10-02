@@ -86,9 +86,9 @@ class PKL_WPZ_REST_API_Auth
         require_once PKL_WPZ_REST_API_AUTH_PLUGIN_DIR . 'includes/class-admin-page.php';
         require_once PKL_WPZ_REST_API_AUTH_PLUGIN_DIR . 'includes/class-user-profile.php';
 
-        $this->database     = new PKL_WPZ_REST_API_Auth_Database();
-        $this->oauth_api    = new PKL_WPZ_REST_API_Auth_OAuth_API($this->database);
-        $this->admin_page   = new PKL_WPZ_REST_API_Auth_Admin_Page($this->database);
+        $this->database = new PKL_WPZ_REST_API_Auth_Database();
+        $this->oauth_api = new PKL_WPZ_REST_API_Auth_OAuth_API($this->database);
+        $this->admin_page = new PKL_WPZ_REST_API_Auth_Admin_Page($this->database);
         $this->user_profile = new PKL_WPZ_REST_API_Auth_User_Profile($this->database);
     }
 
@@ -144,7 +144,7 @@ class PKL_WPZ_REST_API_Auth
         // phpcs:ignore WordPress.Security.NonceVerification.Missing
         if (isset($_POST['api_key']) && !empty($_POST['api_key'])) {
             // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.NonceVerification.Missing
-            $api_key = sanitize_text_field(wp_unslash($_POST['api_key']));
+            $api_key = $_POST['api_key']; // Don't use sanitize_text_field to preserve case
         }
 
         // Method 2 & 4: Check in headers (X-API-Key and Authorization Bearer)
@@ -153,19 +153,19 @@ class PKL_WPZ_REST_API_Auth
             if (is_array($headers)) {
                 // Method 2: X-API-Key header
                 if (isset($headers['X-API-Key'])) {
-                    $api_key = sanitize_text_field($headers['X-API-Key']);
+                    $api_key = $headers['X-API-Key'];
                 } elseif (isset($headers['x-api-key'])) {
-                    $api_key = sanitize_text_field($headers['x-api-key']);
+                    $api_key = $headers['x-api-key'];
                 } // Method 4: Authorization Bearer header
                 elseif (isset($headers['Authorization'])) {
                     $auth_header = $headers['Authorization'];
                     if (strpos($auth_header, 'Bearer ') === 0) {
-                        $api_key = sanitize_text_field(substr($auth_header, 7)); // Remove "Bearer " prefix
+                        $api_key = substr($auth_header, 7); // Remove "Bearer " prefix
                     }
                 } elseif (isset($headers['authorization'])) {
                     $auth_header = $headers['authorization'];
                     if (strpos($auth_header, 'Bearer ') === 0) {
-                        $api_key = sanitize_text_field(substr($auth_header, 7)); // Remove "Bearer " prefix
+                        $api_key = substr($auth_header, 7); // Remove "Bearer " prefix
                     }
                 }
             }
@@ -175,10 +175,18 @@ class PKL_WPZ_REST_API_Auth
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         if (empty($api_key) && isset($_GET['api_key'])) {
             // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.NonceVerification.Recommended
-            $api_key = sanitize_text_field(wp_unslash($_GET['api_key']));
+            $api_key = $_GET['api_key']; // Don't use sanitize_text_field to preserve case
         }
 
         if (!empty($api_key)) {
+            // Validate token format (must start with pkl_wpz_ and be followed by 64 hex characters)
+            if (!$this->validate_token_format($api_key)) {
+                return false;
+            }
+
+            // Trim whitespace but preserve case
+            $api_key = trim($api_key);
+
             $user = $this->database->get_user_by_token($api_key);
             if ($user && !$user['revoked']) {
                 return get_user_by('login', $user['user_login']);
@@ -186,6 +194,33 @@ class PKL_WPZ_REST_API_Auth
         }
 
         return false;
+    }
+
+    /**
+     * Validate token format
+     */
+    private function validate_token_format($token)
+    {
+        // Token must be: pkl_wpz_ + 64 hex characters (case-insensitive for hex, but exact match required)
+        // Total length: 8 (prefix) + 64 (hex) = 72 characters
+        if (strlen($token) !== 72) {
+            return false;
+        }
+
+        // Must start with pkl_wpz_
+        if (strpos($token, 'pkl_wpz_') !== 0) {
+            return false;
+        }
+
+        // Get hex part (after prefix)
+        $hex_part = substr($token, 8);
+
+        // Hex part must be exactly 64 characters and contain only hex characters
+        if (!ctype_xdigit($hex_part)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -198,7 +233,7 @@ class PKL_WPZ_REST_API_Auth
             return $result;
         }
 
-        $allow_root  = get_option('pkl_wpz_rest_api_auth_allow_root_endpoint', 0);
+        $allow_root = get_option('pkl_wpz_rest_api_auth_allow_root_endpoint', 0);
         $allow_pages = get_option('pkl_wpz_rest_api_auth_allow_pages', 0);
         $allow_posts = get_option('pkl_wpz_rest_api_auth_allow_posts', 0);
 

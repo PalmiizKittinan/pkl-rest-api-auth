@@ -75,7 +75,7 @@ class PKL_WPZ_REST_API_Auth_Admin_Page
             'pkl_wpz_rest_api_auth_enable',
             array(
                 'sanitize_callback' => array($this, 'sanitize_checkbox'),
-                'default'           => 1
+                'default' => 1
             )
         );
 
@@ -84,7 +84,7 @@ class PKL_WPZ_REST_API_Auth_Admin_Page
             'pkl_wpz_rest_api_auth_allow_root_endpoint',
             array(
                 'sanitize_callback' => array($this, 'sanitize_checkbox'),
-                'default'           => 0
+                'default' => 0
             )
         );
 
@@ -93,7 +93,7 @@ class PKL_WPZ_REST_API_Auth_Admin_Page
             'pkl_wpz_rest_api_auth_allow_pages',
             array(
                 'sanitize_callback' => array($this, 'sanitize_checkbox'),
-                'default'           => 1
+                'default' => 1
             )
         );
 
@@ -102,7 +102,7 @@ class PKL_WPZ_REST_API_Auth_Admin_Page
             'pkl_wpz_rest_api_auth_allow_posts',
             array(
                 'sanitize_callback' => array($this, 'sanitize_checkbox'),
-                'default'           => 1
+                'default' => 1
             )
         );
     }
@@ -136,9 +136,9 @@ class PKL_WPZ_REST_API_Auth_Admin_Page
 
         wp_safe_redirect(add_query_arg(
             array(
-                'page'     => 'pkl-wpz-rest-api-auth',
-                'tab'      => 'tokens',
-                'message'  => 'revoked',
+                'page' => 'pkl-wpz-rest-api-auth',
+                'tab' => 'tokens',
+                'message' => 'revoked',
                 '_wpnonce' => wp_create_nonce('pklwpz_admin_message')
             ),
             admin_url('options-general.php')
@@ -167,9 +167,9 @@ class PKL_WPZ_REST_API_Auth_Admin_Page
 
         wp_safe_redirect(add_query_arg(
             array(
-                'page'     => 'pkl-wpz-rest-api-auth',
-                'tab'      => 'tokens',
-                'message'  => 'restored',
+                'page' => 'pkl-wpz-rest-api-auth',
+                'tab' => 'tokens',
+                'message' => 'restored',
                 '_wpnonce' => wp_create_nonce('pklwpz_admin_message')
             ),
             admin_url('options-general.php')
@@ -198,9 +198,9 @@ class PKL_WPZ_REST_API_Auth_Admin_Page
 
         wp_safe_redirect(add_query_arg(
             array(
-                'page'     => 'pkl-wpz-rest-api-auth',
-                'tab'      => 'tokens',
-                'message'  => 'deleted',
+                'page' => 'pkl-wpz-rest-api-auth',
+                'tab' => 'tokens',
+                'message' => 'deleted',
                 '_wpnonce' => wp_create_nonce('pklwpz_admin_message')
             ),
             admin_url('options-general.php')
@@ -228,8 +228,8 @@ class PKL_WPZ_REST_API_Auth_Admin_Page
             if (wp_verify_nonce($nonce, 'pklwpz_admin_message')) {
                 // phpcs:ignore WordPress.Security.NonceVerification.Recommended
                 $message = sanitize_text_field(wp_unslash($_GET['message']));
-                $class   = 'notice-success';
-                $text    = '';
+                $class = 'notice-success';
+                $text = '';
 
                 switch ($message) {
                     case 'revoked':
@@ -400,14 +400,14 @@ class PKL_WPZ_REST_API_Auth_Admin_Page
                             <td>
                                 <?php
                                 if (function_exists('wp_timezone')) {
-                                    $wp_timezone  = wp_timezone();
+                                    $wp_timezone = wp_timezone();
                                     $created_date = new DateTime($token['created_at'], $wp_timezone);
                                     echo esc_html($created_date->format('Y-m-d\TH:i:s'));
                                     echo ' ' . esc_html($wp_timezone->getName()) . ' ';
                                     echo esc_html__('(WordPress Site Time)', 'pkl-wpz-rest-api-auth');
                                 } else {
                                     $server_timezone = new DateTimeZone(date_default_timezone_get());
-                                    $created_date    = new DateTime($token['created_at'], $server_timezone);
+                                    $created_date = new DateTime($token['created_at'], $server_timezone);
                                     echo esc_html($created_date->format('Y-m-d\TH:i:s'));
                                     echo ' ' . esc_html($server_timezone->getName()) . ' ';
                                     echo esc_html__('(Server Time)', 'pkl-wpz-rest-api-auth');
@@ -461,6 +461,9 @@ class PKL_WPZ_REST_API_Auth_Admin_Page
     /**
      * Render guide tab
      */
+    /**
+     * Render guide tab
+     */
     private function render_guide_tab()
     {
         ?>
@@ -473,9 +476,19 @@ class PKL_WPZ_REST_API_Auth_Admin_Page
                 <ol>
                     <li><?php esc_html_e('Navigate to Users → Your Profile (or Profile)', 'pkl-wpz-rest-api-auth'); ?></li>
                     <li><?php esc_html_e('Scroll down to "REST API Access" section', 'pkl-wpz-rest-api-auth'); ?></li>
-                    <li><?php esc_html_e('Click "Generate API Key"', 'pkl-wpz-rest-api-auth'); ?></li>
-                    <li><?php esc_html_e('Copy your API key', 'pkl-wpz-rest-api-auth'); ?></li>
+                    <li><?php esc_html_e('Click "Generate New API Key"', 'pkl-wpz-rest-api-auth'); ?></li>
+                    <li><?php esc_html_e('Copy your API key exactly as shown (case-sensitive)', 'pkl-wpz-rest-api-auth'); ?></li>
                 </ol>
+            </div>
+
+            <div class="notice notice-warning inline">
+                <p><strong><?php esc_html_e('⚠️ Important: API Keys are Case-Sensitive', 'pkl-wpz-rest-api-auth'); ?></strong></p>
+                <ul>
+                    <li><?php esc_html_e('API keys must be copied exactly as displayed', 'pkl-wpz-rest-api-auth'); ?></li>
+                    <li><?php esc_html_e('Uppercase and lowercase letters are different', 'pkl-wpz-rest-api-auth'); ?></li>
+                    <li><?php esc_html_e('Example: "pkl_wpz_abc123" is different from "PKL_WPZ_ABC123"', 'pkl-wpz-rest-api-auth'); ?></li>
+                    <li><?php esc_html_e('Avoid typing keys manually - use copy/paste', 'pkl-wpz-rest-api-auth'); ?></li>
+                </ul>
             </div>
 
             <div class="pklwpz-guide-box">
@@ -528,13 +541,15 @@ status: draft</pre>
                     <br>
                     <strong><?php esc_html_e('Headers:', 'pkl-wpz-rest-api-auth'); ?></strong>
                     <pre>Authorization: Bearer pkl_wpz_abcd1234...
-Content-Type: application/json</pre>
+                        Content-Type: application/json
+                    </pre>
                     <strong><?php esc_html_e('Body (JSON):', 'pkl-wpz-rest-api-auth'); ?></strong>
                     <pre>{
-  "title": "My New Post",
-  "content": "This is the post content",
-  "status": "draft"
-}</pre>
+                          "title": "My New Post",
+                          "content": "This is the post content",
+                          "status": "draft"
+                        }
+                    </pre>
                 </div>
             </div>
 
@@ -546,6 +561,7 @@ Content-Type: application/json</pre>
                     <li><?php esc_html_e('🥉 Form-data (Good for testing)', 'pkl-wpz-rest-api-auth'); ?></li>
                     <li><?php esc_html_e('🚫 Query Parameter (Development only - not recommended for production)', 'pkl-wpz-rest-api-auth'); ?></li>
                     <li><?php esc_html_e('Keep your API key secure and do not share it', 'pkl-wpz-rest-api-auth'); ?></li>
+                    <li><?php esc_html_e('⚠️ API keys are case-sensitive - copy them exactly', 'pkl-wpz-rest-api-auth'); ?></li>
                 </ul>
             </div>
         </div>
