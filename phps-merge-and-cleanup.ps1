@@ -33,7 +33,7 @@ try {
     if ($NoFF) {
         git merge --no-ff $BranchName -m "Merge $BranchName into $TargetBranch"
     } else {
-        git merge $BranchName
+        git merge "origin/$BranchName"
     }
 
     if ($LASTEXITCODE -eq 0) {
