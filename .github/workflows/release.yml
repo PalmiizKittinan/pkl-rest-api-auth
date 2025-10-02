@@ -91,9 +91,9 @@ jobs:
           sed -i "s/\* Version: .*/\* Version: $VERSION/" pkl-wpz-rest-api-auth.php
           echo "✅ Updated Version comment"
           
-          # 2. Update PKL_REST_API_AUTH_VERSION constant
-          sed -i "s/define([[:space:]]*'PKL_REST_API_AUTH_VERSION'[[:space:]]*,[[:space:]]*'[^']*'[[:space:]]*);/define( 'PKL_REST_API_AUTH_VERSION', '$VERSION' );/" pkl-wpz-rest-api-auth.php
-          echo "✅ Updated PKL_REST_API_AUTH_VERSION constant"
+          # 2. Update PKL_WPZ_REST_API_AUTH_VERSION constant
+          sed -i "s/define([[:space:]]*'PKL_WPZ_REST_API_AUTH_VERSION'[[:space:]]*,[[:space:]]*'[^']*'[[:space:]]*);/define( 'PKL_WPZ_REST_API_AUTH_VERSION', '$VERSION' );/" pkl-wpz-rest-api-auth.php
+          echo "✅ Updated PKL_WPZ_REST_API_AUTH_VERSION constant"
           
           # 3. Update readme.txt
           if [[ -f "readme.txt" ]]; then
@@ -112,7 +112,7 @@ jobs:
           # Show updated lines
           echo "📋 Updated lines in pkl-wpz-rest-api-auth.php:"
           grep -n "Version:" pkl-wpz-rest-api-auth.php | head -1
-          grep -n "PKL_REST_API_AUTH_VERSION" pkl-wpz-rest-api-auth.php
+          grep -n "PKL_WPZ_REST_API_AUTH_VERSION" pkl-wpz-rest-api-auth.php
           
           if [[ -f "readme.txt" ]]; then
             echo ""
