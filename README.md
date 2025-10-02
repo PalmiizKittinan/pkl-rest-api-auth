@@ -188,7 +188,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ### 2. Merge and Cleanup Worktree (After the development is complete)
 
 ```text
-.\phps-merge-and-cleanup.ps1 "dev/2.4.0" (After Finish Develop)
+.\phps-merge-and-cleanup.ps1 "dev/2.4.0"
 ```
 
 ### 3. Created Git Tag After Merge Finished
