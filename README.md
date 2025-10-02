@@ -1,7 +1,7 @@
 # 🔐 PKL REST API Auth
 
 ![](https://img.shields.io/badge/Stable_Plugin_Version%20-v2.5.1%20-default)
-![](https://img.shields.io/badge/Manual_Version%20-1.1.1%20-blue)<br>
+![](https://img.shields.io/badge/Manual_Version%20-1.2.0%20-blue)<br>
 
 ---
 
@@ -185,10 +185,10 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
     ```
 - Open Your Worktree Project with PHPStorm
 
-### 2. Merge and Cleanup Worktree
+### 2. Merge and Cleanup Worktree (After the development is complete)
 
 ```text
-.\phps-merge-and-cleanup.ps1 "dev-2-4-0"
+.\phps-merge-and-cleanup.ps1 "dev/2.4.0" (After Finish Develop)
 ```
 
 ### 3. Created Git Tag After Merge Finished
@@ -199,12 +199,6 @@ git tag -a "v2.4.0" -m "Updated Minor Version"
 
 # Push Git Tag
 git push origin v2.4.0
-```
-
-### 4. Remove Worktree
-
-```text
-.\phps-remove-worktree.ps1 "dev-2-4-0"
 ```
 
 ---
