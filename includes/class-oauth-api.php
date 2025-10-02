@@ -1,14 +1,13 @@
 <?php
 /**
- * OAuth API handler for PKL REST API Auth (Disabled)
+ * OAuth API handler for PKL WPZ REST API Auth
  */
-
 if (!defined('ABSPATH')) {
     exit;
 }
 
-class PKL_REST_API_Auth_OAuth_API {
-
+class PKL_WPZ_REST_API_Auth_OAuth_API
+{
     /**
      * Database handler
      */
@@ -17,15 +16,17 @@ class PKL_REST_API_Auth_OAuth_API {
     /**
      * Constructor
      */
-    public function __construct($database) {
+    public function __construct($database)
+    {
         $this->database = $database;
     }
 
     /**
-     * Initialize - OAuth endpoints are disabled
+     * Initialize
      */
-    public function init() {
-        // OAuth endpoints are disabled for security reasons
-        // Users should generate API keys through their profile page instead
+    public function init()
+    {
+        // This class is reserved for future OAuth implementation
+        // Currently using simple API key authentication
     }
 }

@@ -1,14 +1,14 @@
-.pkl-status-active {
+.pklwpz-status-active {
     color: #2e7d32;
     font-weight: bold;
 }
 
-.pkl-status-revoked {
+.pklwpz-status-revoked {
     color: #c62828;
     font-weight: bold;
 }
 
-#pkl-api-key-display {
+#pklwpz-api-key-display {
     background: #f8f9fa;
     padding: 8px;
     border: 1px solid #ddd;

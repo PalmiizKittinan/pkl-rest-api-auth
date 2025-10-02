@@ -1,15 +1,13 @@
 <?php
 /**
- * User profile handler for PKL REST API Auth
+ * User profile handler for PKL WPZ REST API Auth
  */
-
 if (!defined('ABSPATH')) {
     exit;
 }
 
-class PKL_REST_API_Auth_User_Profile
+class PKL_WPZ_REST_API_Auth_User_Profile
 {
-
     /**
      * Database handler
      */
@@ -30,8 +28,8 @@ class PKL_REST_API_Auth_User_Profile
     {
         add_action('show_user_profile', array($this, 'add_api_key_fields'));
         add_action('edit_user_profile', array($this, 'add_api_key_fields'));
-        add_action('wp_ajax_pkl_generate_api_key', array($this, 'ajax_generate_api_key'));
-        add_action('wp_ajax_pkl_revoke_api_key', array($this, 'ajax_revoke_api_key'));
+        add_action('wp_ajax_pklwpz_generate_api_key', array($this, 'ajax_generate_api_key'));
+        add_action('wp_ajax_pklwpz_revoke_api_key', array($this, 'ajax_revoke_api_key'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_profile_scripts'));
     }
 
@@ -46,10 +44,10 @@ class PKL_REST_API_Auth_User_Profile
 
         // Enqueue CSS
         wp_enqueue_style(
-            'pkl-rest-api-auth-profile',
-            PKL_REST_API_AUTH_PLUGIN_URL . 'assets/user-profile.css',
+            'pkl-wpz-rest-api-auth-profile',
+            PKL_WPZ_REST_API_AUTH_PLUGIN_URL . 'assets/user-profile.css',
             array(),
-            PKL_REST_API_AUTH_VERSION
+            PKL_WPZ_REST_API_AUTH_VERSION
         );
 
         // Enqueue jQuery
@@ -57,27 +55,27 @@ class PKL_REST_API_Auth_User_Profile
 
         // Create a separate script handle for better organization
         wp_register_script(
-            'pkl-rest-api-auth-profile-js',
+            'pkl-wpz-rest-api-auth-profile-js',
             '', // empty URL for inline script
             array('jquery'),
-            PKL_REST_API_AUTH_VERSION,
+            PKL_WPZ_REST_API_AUTH_VERSION,
             true
         );
-        wp_enqueue_script('pkl-rest-api-auth-profile-js');
+        wp_enqueue_script('pkl-wpz-rest-api-auth-profile-js');
 
         // Add inline script
-        wp_add_inline_script('pkl-rest-api-auth-profile-js', $this->get_profile_js());
+        wp_add_inline_script('pkl-wpz-rest-api-auth-profile-js', $this->get_profile_js());
 
-        // Localize script for AJAX (safer than inline nonce)
-        wp_localize_script('pkl-rest-api-auth-profile-js', 'pklApiAuth', array(
+        // Localize script for AJAX
+        wp_localize_script('pkl-wpz-rest-api-auth-profile-js', 'pklwpzApiAuth', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('pkl_api_key_action'),
+            'nonce'   => wp_create_nonce('pklwpz_api_key_action'),
             'strings' => array(
-                'generating' => __('Generating...', 'pkl-rest-api-auth'),
-                'generateBtn' => __('Generate New API Key', 'pkl-rest-api-auth'),
-                'active' => __('Active', 'pkl-rest-api-auth'),
-                'confirmRevoke' => __('Are you sure you want to revoke your API key? This will disable API access.', 'pkl-rest-api-auth'),
-                'revoked' => __('Revoked', 'pkl-rest-api-auth')
+                'generating'    => __('Generating...', 'pkl-wpz-rest-api-auth'),
+                'generateBtn'   => __('Generate New API Key', 'pkl-wpz-rest-api-auth'),
+                'active'        => __('Active', 'pkl-wpz-rest-api-auth'),
+                'confirmRevoke' => __('Are you sure you want to revoke your API key? This will disable API access.', 'pkl-wpz-rest-api-auth'),
+                'revoked'       => __('Revoked', 'pkl-wpz-rest-api-auth')
             )
         ));
     }
@@ -89,53 +87,52 @@ class PKL_REST_API_Auth_User_Profile
     {
         return "
             jQuery(document).ready(function($) {
-                $('#pkl-generate-api-key').on('click', function(e) {
+                $('#pklwpz-generate-api-key').on('click', function(e) {
                     e.preventDefault();
                     var button = $(this);
                     var userId = button.data('user-id');
-    
-                    // เก็บตำแหน่งการเลื่อนของหน้า
+                    
                     sessionStorage.setItem('scrollPos', window.scrollY);
-    
-                    button.prop('disabled', true).text(pklApiAuth.strings.generating);
-    
-                    $.post(pklApiAuth.ajaxurl, {
-                        action: 'pkl_generate_api_key',
+                    
+                    button.prop('disabled', true).text(pklwpzApiAuth.strings.generating);
+                    
+                    $.post(pklwpzApiAuth.ajaxurl, {
+                        action: 'pklwpz_generate_api_key',
                         user_id: userId,
-                        _wpnonce: pklApiAuth.nonce
+                        _wpnonce: pklwpzApiAuth.nonce
                     }, function(response) {
                         if (response.success) {
-                            $('#pkl-api-key-display').text(response.data.api_key).show();
-                            $('#pkl-api-key-status').removeClass('pkl-status-revoked').addClass('pkl-status-active').text(pklApiAuth.strings.active);
-                            $('#pkl-revoke-api-key').show();
+                            $('#pklwpz-api-key-display').text(response.data.api_key).show();
+                            $('#pklwpz-api-key-status').removeClass('pklwpz-status-revoked').addClass('pklwpz-status-active').text(pklwpzApiAuth.strings.active);
+                            $('#pklwpz-revoke-api-key').show();
                             alert(response.data.message);
                         } else {
                             alert(response.data);
                         }
                     }).always(function() {
-                        button.prop('disabled', false).text(pklApiAuth.strings.generateBtn);
+                        button.prop('disabled', false).text(pklwpzApiAuth.strings.generateBtn);
                     });
                 });
-    
-                $('#pkl-revoke-api-key').on('click', function(e) {
+                
+                $('#pklwpz-revoke-api-key').on('click', function(e) {
                     e.preventDefault();
-    
-                    if (!confirm(pklApiAuth.strings.confirmRevoke)) {
+                    
+                    if (!confirm(pklwpzApiAuth.strings.confirmRevoke)) {
                         return;
                     }
-    
+                    
                     var button = $(this);
                     var userId = button.data('user-id');
-    
+                    
                     button.prop('disabled', true);
-    
-                    $.post(pklApiAuth.ajaxurl, {
-                        action: 'pkl_revoke_api_key',
+                    
+                    $.post(pklwpzApiAuth.ajaxurl, {
+                        action: 'pklwpz_revoke_api_key',
                         user_id: userId,
-                        _wpnonce: pklApiAuth.nonce
+                        _wpnonce: pklwpzApiAuth.nonce
                     }, function(response) {
                         if (response.success) {
-                            $('#pkl-api-key-status').removeClass('pkl-status-active').addClass('pkl-status-revoked').text(pklApiAuth.strings.revoked);
+                            $('#pklwpz-api-key-status').removeClass('pklwpz-status-active').addClass('pklwpz-status-revoked').text(pklwpzApiAuth.strings.revoked);
                             button.hide();
                             alert(response.data);
                         } else {
@@ -145,12 +142,11 @@ class PKL_REST_API_Auth_User_Profile
                         button.prop('disabled', false);
                     });
                 });
-    
-                // หลังจากโหลดหน้าใหม่ ให้เลื่อนกลับไปยังตำแหน่งเดิม
+                
                 const scrollPos = sessionStorage.getItem('scrollPos');
                 if (scrollPos !== null) {
                     window.scrollTo(0, parseInt(scrollPos));
-                    sessionStorage.removeItem('scrollPos'); // ลบตำแหน่งการเลื่อนหลังจากใช้งานแล้ว
+                    sessionStorage.removeItem('scrollPos');
                 }
             });
         ";
@@ -162,104 +158,104 @@ class PKL_REST_API_Auth_User_Profile
     public function add_api_key_fields($user)
     {
         $current_user_id = get_current_user_id();
-
         // Only show to the user themselves or admins
         if ($user->ID !== $current_user_id && !current_user_can('manage_options')) {
             return;
         }
 
         $api_key_data = $this->database->get_user_api_key($user->ID);
-        $is_revoked = $api_key_data && $api_key_data['revoked'];
-        $is_admin = current_user_can('manage_options');
+        $is_revoked   = $api_key_data && $api_key_data['revoked'];
+        $is_admin     = current_user_can('manage_options');
         ?>
-        <h3><?php esc_html_e('REST API Access', 'pkl-rest-api-auth'); ?></h3>
+        <h3><?php esc_html_e('REST API Access', 'pkl-wpz-rest-api-auth'); ?></h3>
         <table class="form-table">
             <tr>
-                <th><label><?php esc_html_e('API Key', 'pkl-rest-api-auth'); ?></label></th>
+                <th><label><?php esc_html_e('API Key', 'pkl-wpz-rest-api-auth'); ?></label></th>
                 <td>
                     <?php if ($api_key_data): ?>
                         <p>
-                            <code id="pkl-api-key-display" style="<?php echo $api_key_data['revoked'] ? 'display:none;' : ''; ?>">
+                            <code id="pklwpz-api-key-display"
+                                  style="<?php echo $api_key_data['revoked'] ? 'display:none;' : ''; ?>">
                                 <?php echo $api_key_data['revoked'] ? '' : esc_html($api_key_data['access_token']); ?>
                             </code>
                         </p>
                         <p>
-                            <strong><?php esc_html_e('Status:', 'pkl-rest-api-auth'); ?></strong>
-                            <span id="pkl-api-key-status" class="<?php echo $api_key_data['revoked'] ? 'pkl-status-revoked' : 'pkl-status-active'; ?>">
-                            <?php echo $api_key_data['revoked'] ? esc_html__('Revoked', 'pkl-rest-api-auth') : esc_html__('Active', 'pkl-rest-api-auth'); ?>
+                            <strong><?php esc_html_e('Status:', 'pkl-wpz-rest-api-auth'); ?></strong>
+                            <span id="pklwpz-api-key-status"
+                                  class="<?php echo $api_key_data['revoked'] ? 'pklwpz-status-revoked' : 'pklwpz-status-active'; ?>">
+                            <?php echo $api_key_data['revoked'] ? esc_html__('Revoked', 'pkl-wpz-rest-api-auth') : esc_html__('Active', 'pkl-wpz-rest-api-auth'); ?>
                         </span>
                         </p>
                         <p>
-                            <strong><?php esc_html_e('Created:', 'pkl-rest-api-auth'); ?></strong>
+                            <strong><?php esc_html_e('Created:', 'pkl-wpz-rest-api-auth'); ?></strong>
                             <?php
                             if (function_exists('wp_timezone')) {
-                                $wp_timezone = wp_timezone();
+                                $wp_timezone  = wp_timezone();
                                 $created_date = new DateTime($api_key_data['created_at'], $wp_timezone);
-
                                 echo esc_html($created_date->format('Y-m-d\TH:i:s'));
                                 echo ' ' . esc_html($wp_timezone->getName()) . ' ';
-                                echo esc_html__('(WordPress Site Time)', 'pkl-rest-api-auth');
+                                echo esc_html__('(WordPress Site Time)', 'pkl-wpz-rest-api-auth');
                             } else {
                                 $server_timezone = new DateTimeZone(date_default_timezone_get());
-                                $created_date = new DateTime($api_key_data['created_at'], $server_timezone);
-
+                                $created_date    = new DateTime($api_key_data['created_at'], $server_timezone);
                                 echo esc_html($created_date->format('Y-m-d\TH:i:s'));
                                 echo ' ' . esc_html($server_timezone->getName()) . ' ';
-                                echo esc_html__('(Server Time)', 'pkl-rest-api-auth');
+                                echo esc_html__('(Server Time)', 'pkl-wpz-rest-api-auth');
                             }
                             ?>
                         </p>
                     <?php else: ?>
-                        <p><em><?php esc_html_e('No API key generated yet.', 'pkl-rest-api-auth'); ?></em></p>
-                        <code id="pkl-api-key-display" style="display:none;"></code>
+                        <p><em><?php esc_html_e('No API key generated yet.', 'pkl-wpz-rest-api-auth'); ?></em></p>
+                        <code id="pklwpz-api-key-display" style="display:none;"></code>
                         <p>
-                            <strong><?php esc_html_e('Status:', 'pkl-rest-api-auth'); ?></strong>
-                            <span id="pkl-api-key-status" class="pkl-status-revoked"><?php esc_html_e('No Key', 'pkl-rest-api-auth'); ?></span>
+                            <strong><?php esc_html_e('Status:', 'pkl-wpz-rest-api-auth'); ?></strong>
+                            <span id="pklwpz-api-key-status"
+                                  class="pklwpz-status-revoked"><?php esc_html_e('No Key', 'pkl-wpz-rest-api-auth'); ?></span>
                         </p>
                     <?php endif; ?>
 
                     <?php if ($is_revoked && !$is_admin): ?>
-                        <!-- Revoked user can't generate new key -->
                         <div class="notice notice-error inline" style="margin: 10px 0;">
-                            <p><strong><?php esc_html_e('Access Restricted', 'pkl-rest-api-auth'); ?></strong></p>
-                            <p><?php esc_html_e('Your API key was revoked. Please contact the administrator to restore access.', 'pkl-rest-api-auth'); ?></p>
+                            <p><strong><?php esc_html_e('Access Restricted', 'pkl-wpz-rest-api-auth'); ?></strong></p>
+                            <p><?php esc_html_e('Your API key was revoked. Please contact the administrator to restore access.', 'pkl-wpz-rest-api-auth'); ?></p>
                         </div>
                         <p>
                             <button type="button" class="button button-primary" disabled>
-                                <?php esc_html_e('Generate New API Key', 'pkl-rest-api-auth'); ?>
+                                <?php esc_html_e('Generate New API Key', 'pkl-wpz-rest-api-auth'); ?>
                             </button>
                             <span class="description" style="margin-left: 10px;">
-                            <?php esc_html_e('Contact administrator for access restoration', 'pkl-rest-api-auth'); ?>
+                            <?php esc_html_e('Contact administrator for access restoration', 'pkl-wpz-rest-api-auth'); ?>
                         </span>
                         </p>
                     <?php else: ?>
-                        <!-- Normal users or admins can generate keys -->
                         <p>
-                            <button type="button" id="pkl-generate-api-key" class="button button-primary" data-user-id="<?php echo esc_attr($user->ID); ?>">
-                                <?php esc_html_e('Generate New API Key', 'pkl-rest-api-auth'); ?>
+                            <button type="button" id="pklwpz-generate-api-key" class="button button-primary"
+                                    data-user-id="<?php echo esc_attr($user->ID); ?>">
+                                <?php esc_html_e('Generate New API Key', 'pkl-wpz-rest-api-auth'); ?>
                             </button>
-
                             <?php if ($api_key_data && !$api_key_data['revoked']): ?>
-                                <button type="button" id="pkl-revoke-api-key" class="button button-secondary" data-user-id="<?php echo esc_attr($user->ID); ?>">
-                                    <?php esc_html_e('Revoke API Key', 'pkl-rest-api-auth'); ?>
+                                <button type="button" id="pklwpz-revoke-api-key" class="button button-secondary"
+                                        data-user-id="<?php echo esc_attr($user->ID); ?>">
+                                    <?php esc_html_e('Revoke API Key', 'pkl-wpz-rest-api-auth'); ?>
                                 </button>
                             <?php else: ?>
-                                <button type="button" id="pkl-revoke-api-key" class="button button-secondary" data-user-id="<?php echo esc_attr($user->ID); ?>" style="display:none;">
-                                    <?php esc_html_e('Revoke API Key', 'pkl-rest-api-auth'); ?>
+                                <button type="button" id="pklwpz-revoke-api-key" class="button button-secondary"
+                                        data-user-id="<?php echo esc_attr($user->ID); ?>" style="display:none;">
+                                    <?php esc_html_e('Revoke API Key', 'pkl-wpz-rest-api-auth'); ?>
                                 </button>
                             <?php endif; ?>
                         </p>
-
                         <?php if ($is_admin && $is_revoked): ?>
                             <div class="notice notice-warning inline" style="margin: 10px 0;">
-                                <p><strong><?php esc_html_e('Administrator Notice', 'pkl-rest-api-auth'); ?></strong></p>
-                                <p><?php esc_html_e('This user\'s API key is revoked. As an administrator, you can generate a new key to restore access.', 'pkl-rest-api-auth'); ?></p>
+                                <p><strong><?php esc_html_e('Administrator Notice', 'pkl-wpz-rest-api-auth'); ?></strong>
+                                </p>
+                                <p><?php esc_html_e('This user\'s API key is revoked. As an administrator, you can generate a new key to restore access.', 'pkl-wpz-rest-api-auth'); ?></p>
                             </div>
                         <?php endif; ?>
                     <?php endif; ?>
 
                     <p class="description">
-                        <?php esc_html_e('Use this API key to authenticate REST API requests. Keep it secure and do not share it with others.', 'pkl-rest-api-auth'); ?>
+                        <?php esc_html_e('Use this API key to authenticate REST API requests. Keep it secure and do not share it with others.', 'pkl-wpz-rest-api-auth'); ?>
                     </p>
                 </td>
             </tr>
@@ -272,21 +268,21 @@ class PKL_REST_API_Auth_User_Profile
      */
     public function ajax_generate_api_key()
     {
-        check_ajax_referer('pkl_api_key_action');
+        check_ajax_referer('pklwpz_api_key_action');
 
-        $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : 0;
+        $user_id         = isset($_POST['user_id']) ? intval($_POST['user_id']) : 0;
         $current_user_id = get_current_user_id();
 
         // Security check
         if ($user_id !== $current_user_id && !current_user_can('manage_options')) {
-            wp_die(esc_html__('You do not have permission to perform this action.', 'pkl-rest-api-auth'));
+            wp_die(esc_html__('You do not have permission to perform this action.', 'pkl-wpz-rest-api-auth'));
         }
 
         // Check if user's API key is revoked (only applies to non-admins)
         if (!current_user_can('manage_options')) {
             $existing_api_key = $this->database->get_user_api_key($user_id);
             if ($existing_api_key && $existing_api_key['revoked']) {
-                wp_send_json_error(esc_html__('Your API key was revoked. Please contact the administrator to restore access.', 'pkl-rest-api-auth'));
+                wp_send_json_error(esc_html__('Your API key was revoked. Please contact the administrator to restore access.', 'pkl-wpz-rest-api-auth'));
                 return;
             }
         }
@@ -296,10 +292,10 @@ class PKL_REST_API_Auth_User_Profile
         if ($api_key) {
             wp_send_json_success(array(
                 'api_key' => $api_key,
-                'message' => esc_html__('API key generated successfully.', 'pkl-rest-api-auth')
+                'message' => esc_html__('API key generated successfully.', 'pkl-wpz-rest-api-auth')
             ));
         } else {
-            wp_send_json_error(esc_html__('Failed to generate API key.', 'pkl-rest-api-auth'));
+            wp_send_json_error(esc_html__('Failed to generate API key.', 'pkl-wpz-rest-api-auth'));
         }
     }
 
@@ -308,34 +304,32 @@ class PKL_REST_API_Auth_User_Profile
      */
     public function ajax_revoke_api_key()
     {
-        check_ajax_referer('pkl_api_key_action');
+        check_ajax_referer('pklwpz_api_key_action');
 
-        $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : 0;
+        $user_id         = isset($_POST['user_id']) ? intval($_POST['user_id']) : 0;
         $current_user_id = get_current_user_id();
 
         // Security check
         if ($user_id !== $current_user_id && !current_user_can('manage_options')) {
-            wp_die(esc_html__('You do not have permission to perform this action.', 'pkl-rest-api-auth'));
+            wp_die(esc_html__('You do not have permission to perform this action.', 'pkl-wpz-rest-api-auth'));
         }
 
         $user = get_userdata($user_id);
         if (!$user) {
-            wp_send_json_error(esc_html__('User not found.', 'pkl-rest-api-auth'));
+            wp_send_json_error(esc_html__('User not found.', 'pkl-wpz-rest-api-auth'));
         }
 
         // Use database class method instead of direct query
         $user_api_key = $this->database->get_user_api_key($user_id);
-
         if ($user_api_key) {
             $result = $this->database->revoke_token($user_api_key['id']);
-
             if ($result !== false) {
-                wp_send_json_success(esc_html__('API key revoked successfully.', 'pkl-rest-api-auth'));
+                wp_send_json_success(esc_html__('API key revoked successfully.', 'pkl-wpz-rest-api-auth'));
             } else {
-                wp_send_json_error(esc_html__('Failed to revoke API key.', 'pkl-rest-api-auth'));
+                wp_send_json_error(esc_html__('Failed to revoke API key.', 'pkl-wpz-rest-api-auth'));
             }
         } else {
-            wp_send_json_error(esc_html__('No API key found for this user.', 'pkl-rest-api-auth'));
+            wp_send_json_error(esc_html__('No API key found for this user.', 'pkl-wpz-rest-api-auth'));
         }
     }
 }

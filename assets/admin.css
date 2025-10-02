@@ -1,19 +1,18 @@
-/* PKL REST API Auth Admin Styles */
+/* PKL WPZ REST API Auth Admin Styles */
 .tab-content {
     margin-top: 20px;
     padding: 1px 0;
 }
 
-.pkl-guide-section,
-.pkl-tokens-section {
+.pklwpz-guide-section,
+.pklwpz-tokens-section {
     max-width: 960px;
     margin-right: auto;
     margin-left: auto;
     padding: 0 15px;
 }
 
-
-.pkl-guide-box {
+.pklwpz-guide-box {
     background: #fff;
     border: 1px solid #c3c4c7;
     border-left: 4px solid #0073aa;
@@ -23,7 +22,7 @@
     border-radius: 4px;
 }
 
-.pkl-guide-box h3 {
+.pklwpz-guide-box h3 {
     margin-top: 0;
     margin-bottom: 15px;
     color: #0073aa;
@@ -32,17 +31,17 @@
     padding-bottom: 10px;
 }
 
-.pkl-guide-box ol {
+.pklwpz-guide-box ol {
     margin-left: 20px;
     margin-top: 10px;
     margin-bottom: 10px;
 }
 
-.pkl-guide-box ol li {
+.pklwpz-guide-box ol li {
     margin-bottom: 8px;
 }
 
-.pkl-code-block {
+.pklwpz-code-block {
     background: #f0f0f1;
     border: 1px solid #dcdcde;
     border-radius: 4px;
@@ -56,11 +55,11 @@
     position: relative;
 }
 
-.pkl-code-block strong {
+.pklwpz-code-block strong {
     color: #222;
 }
 
-.pkl-code-block pre {
+.pklwpz-code-block pre {
     margin: 0;
     background: transparent;
     border: none;
@@ -70,41 +69,41 @@
     word-break: break-all;
 }
 
-.pkl-tokens-section .wp-list-table {
+.pklwpz-tokens-section .wp-list-table {
     margin-top: 20px;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
     border: 1px solid #c3c4c7;
     border-radius: 4px;
 }
 
-.pkl-tokens-section h2 {
+.pklwpz-tokens-section h2 {
     margin-bottom: 15px;
     color: #2c3338;
 }
 
-.pkl-token-revoked {
+.pklwpz-token-revoked {
     background-color: #fce8e8 !important;
 }
 
-.pkl-token-active {
+.pklwpz-token-active {
     background-color: #e8fce8 !important;
 }
 
-.pkl-status-active {
+.pklwpz-status-active {
     color: #228b22;
     font-weight: 600;
 }
 
-.pkl-status-revoked {
+.pklwpz-status-revoked {
     color: #dc3232;
     font-weight: 600;
 }
 
-.pkl-actions {
+.pklwpz-actions {
     white-space: nowrap;
 }
 
-.pkl-actions form {
+.pklwpz-actions form {
     margin-right: 5px;
     display: inline-block;
     vertical-align: middle;
@@ -151,8 +150,9 @@
     background-color: #e5f5fb;
     border-left-color: #007cba;
     border-radius: 4px;
-    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
 }
+
 .notice.notice-info.inline:before {
     font-family: dashicons;
     content: "\f348";
@@ -170,10 +170,12 @@
     margin-bottom: 10px;
     color: #32373c;
 }
+
 .notice.notice-info.inline ul {
     list-style: disc;
     margin-left: 25px;
 }
+
 .notice.notice-info.inline ul li {
     margin-bottom: 5px;
 }
@@ -181,9 +183,11 @@
 .form-table th {
     width: 280px;
 }
+
 .form-table td {
     padding-left: 10px;
 }
+
 .form-table .description {
     margin-top: 5px;
     font-style: italic;
