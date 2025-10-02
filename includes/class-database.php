@@ -2,304 +2,201 @@
 /**
  * Database handler for PKL REST API Auth
  */
-
 if (!defined('ABSPATH')) {
-	exit;
+    exit;
 }
 
-class PKL_REST_API_Auth_Database {
+class PKL_REST_API_Auth_Database
+{
+    /**
+     * Table name
+     */
+    private $table_name;
 
-	/**
-	 * Table name
-	 */
-	private $table_name;
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        global $wpdb;
+        $this->table_name = $wpdb->prefix . 'pklrest_api_keys';
+    }
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-		global $wpdb;
-		$this->table_name = $wpdb->prefix . 'pkl_rest_api_auth_tokens';
-	}
+    /**
+     * Create database table
+     */
+    public function create_table()
+    {
+        global $wpdb;
 
-	/**
-	 * Create database tables
-	 */
-	public function create_tables() {
-		global $wpdb;
+        $charset_collate = $wpdb->get_charset_collate();
 
-		$charset_collate = $wpdb->get_charset_collate();
-
-		// Use esc_sql for table name to avoid interpolation warning
-		$table_name = esc_sql($this->table_name);
-
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$sql = "CREATE TABLE {$table_name} (
+        $sql = "CREATE TABLE IF NOT EXISTS {$this->table_name} (
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-            user_login varchar(60) NOT NULL,
-            user_email varchar(100) NOT NULL,
-            access_token varchar(255) NOT NULL,
+            user_id bigint(20) unsigned NOT NULL,
+            access_token varchar(64) NOT NULL,
+            created_at datetime NOT NULL,
             revoked tinyint(1) NOT NULL DEFAULT 0,
-            created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id),
-            UNIQUE KEY user_login (user_login),
+            PRIMARY KEY  (id),
             UNIQUE KEY access_token (access_token),
-            KEY user_email (user_email)
-        ) {$charset_collate}";
+            KEY user_id (user_id)
+        ) $charset_collate;";
 
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		dbDelta($sql);
-	}
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
 
-	/**
-	 * Generate API key for user
-	 */
-	public function generate_api_key($user_id) {
-		global $wpdb;
+    /**
+     * Generate API key for user
+     */
+    public function generate_api_key($user_id)
+    {
+        global $wpdb;
 
-		$user = get_userdata($user_id);
-		if (!$user) {
-			return false;
-		}
+        // Generate secure random token
+        $access_token = bin2hex(random_bytes(32));
 
-		// Generate unique API key
-		$api_key = 'pkl_' . wp_generate_password(40, false);
+        // Delete existing tokens for this user
+        $wpdb->delete(
+            $this->table_name,
+            array('user_id' => $user_id),
+            array('%d')
+        );
 
-		// Use esc_sql for table name
-		$table_name = esc_sql($this->table_name);
+        // Insert new token
+        $result = $wpdb->insert(
+            $this->table_name,
+            array(
+                'user_id' => $user_id,
+                'access_token' => $access_token,
+                'created_at' => current_time('mysql'),
+                'revoked' => 0
+            ),
+            array('%d', '%s', '%s', '%d')
+        );
 
-		// Check if user already has an API key
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$existing = $wpdb->get_row(
-			$wpdb->prepare(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"SELECT id, revoked FROM {$table_name} WHERE user_login = %s",
-				$user->user_login
-			)
-		);
+        if ($result === false) {
+            return false;
+        }
 
-		if ($existing) {
-			// Keep the previous revoked status when updating
-			$revoked_status = $existing->revoked;
+        return $access_token;
+    }
 
-			// Update existing API key
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-			$result = $wpdb->update(
-				$this->table_name,
-				array(
-					'access_token' => $api_key,
-					'revoked' => $revoked_status,
-					'created_at' => current_time('mysql')
-				),
-				array('user_login' => $user->user_login),
-				array('%s', '%d', '%s'),
-				array('%s')
-			);
-		} else {
-			// Insert new API key
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$result = $wpdb->insert(
-				$this->table_name,
-				array(
-					'user_login' => $user->user_login,
-					'user_email' => $user->user_email,
-					'access_token' => $api_key,
-					'revoked' => 0,
-					'created_at' => current_time('mysql')
-				),
-				array('%s', '%s', '%s', '%d', '%s')
-			);
-		}
+    /**
+     * Validate API key
+     */
+    public function validate_api_key($access_token)
+    {
+        global $wpdb;
 
-		if ($result !== false) {
-			// Clear relevant caches
-			$this->clear_user_cache($user->user_login);
-			return $api_key;
-		}
+        $token_data = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT * FROM {$this->table_name} WHERE access_token = %s AND revoked = 0",
+                $access_token
+            ),
+            ARRAY_A
+        );
 
-		return false;
-	}
+        if (!$token_data) {
+            return false;
+        }
 
-	/**
-	 * Get user by token
-	 */
-	public function get_user_by_token($access_token) {
-		global $wpdb;
+        return $token_data;
+    }
 
-		// Create cache key
-		$cache_key = 'pkl_api_token_' . md5($access_token);
-		$cached_result = wp_cache_get($cache_key, 'pkl_rest_api_auth');
+    /**
+     * Get user's API key
+     */
+    public function get_user_api_key($user_id)
+    {
+        global $wpdb;
 
-		if ($cached_result !== false) {
-			return $cached_result;
-		}
+        $api_key = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT * FROM {$this->table_name} WHERE user_id = %d ORDER BY created_at DESC LIMIT 1",
+                $user_id
+            ),
+            ARRAY_A
+        );
 
-		// Use esc_sql for table name
-		$table_name = esc_sql($this->table_name);
+        return $api_key;
+    }
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$result = $wpdb->get_row(
-			$wpdb->prepare(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"SELECT * FROM {$table_name} WHERE access_token = %s COLLATE utf8mb4_bin",
-				$access_token
-			),
-			ARRAY_A
-		);
+    /**
+     * Revoke token
+     */
+    public function revoke_token($token_id)
+    {
+        global $wpdb;
 
-		// Cache the result for 5 minutes
-		wp_cache_set($cache_key, $result, 'pkl_rest_api_auth', 300);
+        return $wpdb->update(
+            $this->table_name,
+            array('revoked' => 1),
+            array('id' => $token_id),
+            array('%d'),
+            array('%d')
+        );
+    }
 
-		return $result;
-	}
+    /**
+     * Get all API keys with user info
+     */
+    public function get_all_api_keys()
+    {
+        global $wpdb;
 
-	/**
-	 * Get all tokens
-	 */
-	public function get_all_tokens() {
-		global $wpdb;
+        $results = $wpdb->get_results(
+            "SELECT k.*, u.user_login, u.user_email, u.display_name 
+            FROM {$this->table_name} k
+            LEFT JOIN {$wpdb->users} u ON k.user_id = u.ID
+            ORDER BY k.created_at DESC",
+            ARRAY_A
+        );
 
-		$cache_key = 'pkl_all_tokens';
-		$cached_result = wp_cache_get($cache_key, 'pkl_rest_api_auth');
+        return $results;
+    }
 
-		if ($cached_result !== false) {
-			return $cached_result;
-		}
+    /**
+     * Delete API key
+     */
+    public function delete_api_key($token_id)
+    {
+        global $wpdb;
 
-		// Use esc_sql for table name
-		$table_name = esc_sql($this->table_name);
+        return $wpdb->delete(
+            $this->table_name,
+            array('id' => $token_id),
+            array('%d')
+        );
+    }
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$result = $wpdb->get_results(
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			"SELECT * FROM {$table_name} ORDER BY created_at DESC",
-			ARRAY_A
-		);
+    /**
+     * Search API keys
+     */
+    public function search_api_keys($search_term)
+    {
+        global $wpdb;
 
-		// Cache the result for 2 minutes
-		wp_cache_set($cache_key, $result, 'pkl_rest_api_auth', 120);
+        $search_term = '%' . $wpdb->esc_like($search_term) . '%';
 
-		return $result;
-	}
+        $results = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT k.*, u.user_login, u.user_email, u.display_name 
+                FROM {$this->table_name} k
+                LEFT JOIN {$wpdb->users} u ON k.user_id = u.ID
+                WHERE u.user_login LIKE %s 
+                   OR u.user_email LIKE %s 
+                   OR u.display_name LIKE %s
+                   OR k.access_token LIKE %s
+                ORDER BY k.created_at DESC",
+                $search_term,
+                $search_term,
+                $search_term,
+                $search_term
+            ),
+            ARRAY_A
+        );
 
-	/**
-	 * Revoke token
-	 */
-	public function revoke_token($id) {
-		global $wpdb;
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$result = $wpdb->update(
-			$this->table_name,
-			array('revoked' => 1),
-			array('id' => $id),
-			array('%d'),
-			array('%d')
-		);
-
-		if ($result !== false) {
-			$this->clear_all_caches();
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Restore token
-	 */
-	public function restore_token($id) {
-		global $wpdb;
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$result = $wpdb->update(
-			$this->table_name,
-			array('revoked' => 0),
-			array('id' => $id),
-			array('%d'),
-			array('%d')
-		);
-
-		if ($result !== false) {
-			$this->clear_all_caches();
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Delete token
-	 */
-	public function delete_token($id) {
-		global $wpdb;
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$result = $wpdb->delete(
-			$this->table_name,
-			array('id' => $id),
-			array('%d')
-		);
-
-		if ($result !== false) {
-			$this->clear_all_caches();
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Get user's API key
-	 */
-	public function get_user_api_key($user_id) {
-		global $wpdb;
-
-		$user = get_userdata($user_id);
-		if (!$user) {
-			return false;
-		}
-
-		$cache_key = 'pkl_user_api_key_' . $user_id;
-		$cached_result = wp_cache_get($cache_key, 'pkl_rest_api_auth');
-
-		if ($cached_result !== false) {
-			return $cached_result;
-		}
-
-		// Use esc_sql for table name
-		$table_name = esc_sql($this->table_name);
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$result = $wpdb->get_row(
-			$wpdb->prepare(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"SELECT * FROM {$table_name} WHERE user_login = %s",
-				$user->user_login
-			),
-			ARRAY_A
-		);
-
-		// Cache the result for 5 minutes
-		wp_cache_set($cache_key, $result, 'pkl_rest_api_auth', 300);
-
-		return $result;
-	}
-
-	/**
-	 * Clear user-specific cache
-	 */
-	private function clear_user_cache($user_login) {
-		$user = get_user_by('login', $user_login);
-		if ($user) {
-			wp_cache_delete('pkl_user_api_key_' . $user->ID, 'pkl_rest_api_auth');
-		}
-	}
-
-	/**
-	 * Clear all caches
-	 */
-	private function clear_all_caches() {
-		wp_cache_delete('pkl_all_tokens', 'pkl_rest_api_auth');
-
-		// Clear token-specific caches would require knowing all tokens
-		// For now, we'll rely on cache expiration
-	}
+        return $results;
+    }
 }

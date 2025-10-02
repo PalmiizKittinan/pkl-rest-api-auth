@@ -1,191 +1,77 @@
-/* PKL REST API Auth Admin Styles */
-.tab-content {
+.pklrest-api-keys-table {
     margin-top: 20px;
-    padding: 1px 0;
 }
 
-.pkl-guide-section,
-.pkl-tokens-section {
-    max-width: 960px;
-    margin-right: auto;
-    margin-left: auto;
-    padding: 0 15px;
-}
-
-
-.pkl-guide-box {
-    background: #fff;
-    border: 1px solid #c3c4c7;
-    border-left: 4px solid #0073aa;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
-    padding: 20px 25px;
-    margin: 20px 0;
-    border-radius: 4px;
-}
-
-.pkl-guide-box h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: #0073aa;
-    font-size: 1.25em;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-}
-
-.pkl-guide-box ol {
-    margin-left: 20px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-.pkl-guide-box ol li {
-    margin-bottom: 8px;
-}
-
-.pkl-code-block {
-    background: #f0f0f1;
-    border: 1px solid #dcdcde;
-    border-radius: 4px;
-    padding: 15px;
-    margin: 10px 0 20px 0;
-    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-    font-size: 13px;
-    line-height: 1.6;
-    color: #333;
-    overflow-x: auto;
-    position: relative;
-}
-
-.pkl-code-block strong {
-    color: #222;
-}
-
-.pkl-code-block pre {
-    margin: 0;
-    background: transparent;
-    border: none;
-    padding: 0;
-    font-family: inherit;
-    white-space: pre-wrap;
+.pklrest-api-keys-table code {
+    background: #f8f9fa;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 12px;
     word-break: break-all;
 }
 
-.pkl-tokens-section .wp-list-table {
-    margin-top: 20px;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
-    border: 1px solid #c3c4c7;
-    border-radius: 4px;
+.pklrest-status {
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: bold;
 }
 
-.pkl-tokens-section h2 {
-    margin-bottom: 15px;
-    color: #2c3338;
+.pklrest-status-active {
+    color: #2e7d32;
+    background: #e8f5e9;
 }
 
-.pkl-token-revoked {
-    background-color: #fce8e8 !important;
+.pklrest-status-revoked {
+    color: #c62828;
+    background: #ffebee;
 }
 
-.pkl-token-active {
-    background-color: #e8fce8 !important;
+.pklrest-search-form {
+    margin: 20px 0;
 }
 
-.pkl-status-active {
-    color: #228b22;
-    font-weight: 600;
+.pklrest-search-form .search-box {
+    float: right;
 }
 
-.pkl-status-revoked {
-    color: #dc3232;
-    font-weight: 600;
-}
-
-.pkl-actions {
-    white-space: nowrap;
-}
-
-.pkl-actions form {
+.pklrest-search-form input[type="search"] {
+    width: 300px;
     margin-right: 5px;
-    display: inline-block;
-    vertical-align: middle;
 }
 
-.nav-tab-wrapper {
-    margin-bottom: 0;
-    border-bottom: 1px solid #c3c4c7;
+.pklrest-usage-guide {
+    margin-top: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-left: 4px solid #2271b1;
 }
 
-.nav-tab {
-    padding: 8px 15px;
-    font-size: 14px;
-    color: #50575e;
-    border-bottom: none;
-    margin-bottom: -1px;
-}
-
-.nav-tab-active {
-    background-color: #fff;
-    border-color: #c3c4c7 #c3c4c7 #fff;
-    color: #0073aa;
-    font-weight: 600;
-}
-
-.nav-tab .count {
-    background: #0073aa;
-    color: white;
-    border-radius: 10px;
-    padding: 2px 7px;
-    font-size: 11px;
-    margin-left: 6px;
-    min-width: 20px;
-    text-align: center;
-    display: inline-block;
-    line-height: normal;
-}
-
-.notice.notice-info.inline {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    position: relative;
-    padding: 15px 20px 15px 50px;
-    background-color: #e5f5fb;
-    border-left-color: #007cba;
-    border-radius: 4px;
-    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
-}
-.notice.notice-info.inline:before {
-    font-family: dashicons;
-    content: "\f348";
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #007cba;
-    font-size: 1.5em;
-}
-
-.notice.notice-info.inline p,
-.notice.notice-info.inline ul {
+.pklrest-usage-guide h2 {
     margin-top: 0;
-    margin-bottom: 10px;
-    color: #32373c;
-}
-.notice.notice-info.inline ul {
-    list-style: disc;
-    margin-left: 25px;
-}
-.notice.notice-info.inline ul li {
-    margin-bottom: 5px;
 }
 
-.form-table th {
-    width: 280px;
+.pklrest-usage-guide pre {
+    background: #fff;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow-x: auto;
 }
-.form-table td {
-    padding-left: 10px;
+
+.pklrest-usage-guide code {
+    font-family: Consolas, Monaco, monospace;
+    font-size: 13px;
 }
-.form-table .description {
-    margin-top: 5px;
-    font-style: italic;
-    color: #646970;
+
+.pklrest-restore-key {
+    display: none;
+}
+
+tr:has(.pklrest-status-revoked) .pklrest-restore-key {
+    display: inline-block;
+}
+
+tr:has(.pklrest-status-revoked) .pklrest-revoke-key {
+    display: none;
 }
