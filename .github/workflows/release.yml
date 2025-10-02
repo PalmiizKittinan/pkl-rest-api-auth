@@ -42,7 +42,7 @@ jobs:
 
       - name: 📋 Validate Plugin Files
         run: |
-          required_files=("pkl-api-auth.php" "readme.txt")
+          required_files=("pkl-wpz-rest-api-auth.php" "readme.txt")
           for file in "${required_files[@]}"; do
             if [[ ! -f "$file" ]]; then
               echo "❌ Required file missing: $file"
@@ -87,12 +87,12 @@ jobs:
           echo "🔄 Updating version to: $VERSION"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           
-          # 1. Update pkl-api-auth.php (Version comment)
-          sed -i "s/\* Version: .*/\* Version: $VERSION/" pkl-api-auth.php
+          # 1. Update pkl-wpz-rest-api-auth.php (Version comment)
+          sed -i "s/\* Version: .*/\* Version: $VERSION/" pkl-wpz-rest-api-auth.php
           echo "✅ Updated Version comment"
           
           # 2. Update PKL_REST_API_AUTH_VERSION constant
-          sed -i "s/define([[:space:]]*'PKL_REST_API_AUTH_VERSION'[[:space:]]*,[[:space:]]*'[^']*'[[:space:]]*);/define( 'PKL_REST_API_AUTH_VERSION', '$VERSION' );/" pkl-api-auth.php
+          sed -i "s/define([[:space:]]*'PKL_REST_API_AUTH_VERSION'[[:space:]]*,[[:space:]]*'[^']*'[[:space:]]*);/define( 'PKL_REST_API_AUTH_VERSION', '$VERSION' );/" pkl-wpz-rest-api-auth.php
           echo "✅ Updated PKL_REST_API_AUTH_VERSION constant"
           
           # 3. Update readme.txt
@@ -110,9 +110,9 @@ jobs:
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           
           # Show updated lines
-          echo "📋 Updated lines in pkl-api-auth.php:"
-          grep -n "Version:" pkl-api-auth.php | head -1
-          grep -n "PKL_REST_API_AUTH_VERSION" pkl-api-auth.php
+          echo "📋 Updated lines in pkl-wpz-rest-api-auth.php:"
+          grep -n "Version:" pkl-wpz-rest-api-auth.php | head -1
+          grep -n "PKL_REST_API_AUTH_VERSION" pkl-wpz-rest-api-auth.php
           
           if [[ -f "readme.txt" ]]; then
             echo ""
@@ -133,7 +133,7 @@ jobs:
             echo "ℹ️ No changes to commit"
           else
             echo "📝 Committing changes..."
-            git add pkl-api-auth.php readme.txt README.md
+            git add pkl-wpz-rest-api-auth.php readme.txt README.md
             git commit -m "🔖 Bump version to $VERSION [skip ci]"
             git push origin main
           
