@@ -1,4 +1,4 @@
-=== PKL RestAuth - REST API Authentication ===
+=== PKL WPz REST API Authentication ===
 Contributors: kittlam
 Tags: rest-api, authentication, api-key, security
 Requires at least: 5.0
@@ -12,7 +12,7 @@ Control WordPress REST API access by requiring user authentication with API key 
 
 == Description ==
 
-PKL RestAuth provides a simple way to authenticate WordPress REST API requests using API keys. Users can generate their own API keys from their profile page and use them to make authenticated API requests.
+PKL WPz REST API Authentication provides a simple way to authenticate WordPress REST API requests using API keys. Users can generate their own API keys from their profile page and use them to make authenticated API requests.
 
 Features:
 

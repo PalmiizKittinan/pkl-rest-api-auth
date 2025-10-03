@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: PKL RestAuth - REST API Authentication
+ * Plugin Name: PKL WPz REST API Authentication
  * Plugin URI: https://github.com/PalmiizKittinan/pkl-wpz-rest-api-auth
  * Description: Control WordPress REST API access by requiring user authentication with API key system.
  * Version: 3.0.0
