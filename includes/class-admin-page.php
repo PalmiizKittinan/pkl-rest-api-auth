@@ -250,7 +250,7 @@ class PKL_WPZ_REST_API_Auth_Admin_Page
         }
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e('PKL RestAuth - REST API Authentication', 'pkl-wpz-rest-api-auth'); ?></h1>
+            <h1><?php esc_html_e('PKL WPz REST API Authentication', 'pkl-wpz-rest-api-auth'); ?></h1>
 
             <nav class="nav-tab-wrapper">
                 <a href="?page=pkl-wpz-rest-api-auth&tab=settings"
