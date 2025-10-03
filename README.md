@@ -84,7 +84,7 @@ Authorization:Bearer pkl_wpz_abcd1234...
 POST /wp-json/wp/v2/posts
 Content-Type: multipart/form-data
 
-api_key: pkl_abcd1234...
+api_key: pkl_wpz_abcd1234...
 title: Test Post
 content: Post content here
 status: draft
@@ -94,7 +94,7 @@ status: draft
 
 ```text
 GET /wp-json/wp/v2/posts
-X-API-Key: pkl_abcd1234...
+X-API-Key: pkl_wpz_abcd1234...
 ```
 
 #### 🚨 Method 4: Query Parameter (Development Only)
