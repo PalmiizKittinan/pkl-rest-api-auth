@@ -75,7 +75,7 @@ Go to **Settings → PKL REST API Auth** to:
 
 ```text
 GET /wp-json/wp/v2/posts
-Authorization:Bearer pkl_abcd1234...
+Authorization:Bearer pkl_wpz_abcd1234...
 ```
 
 #### 🚀 Method 2: Form-data (Recommended for Testing)
