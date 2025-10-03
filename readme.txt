@@ -78,6 +78,9 @@ Security patch with Bearer token support added. Update recommended for enhanced 
 
 == Changelog ==
 
+= 3.0.1 =
+* Rename some function.
+
 = 3.0.0 =
 * Initial release
 * API key authentication support
