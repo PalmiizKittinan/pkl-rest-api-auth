@@ -3,6 +3,8 @@
 ![](https://img.shields.io/badge/Stable_Plugin_Version%20-v1.0.0%20-default)
 ![](https://img.shields.io/badge/Manual_Version%20-1.2.2%20-blue)<br>
 
+[WordPress_Plugin](https://wordpress.org/plugins/pkl-wpz-rest-api-auth/)
+
 ---
 
 ## 📝 Description
