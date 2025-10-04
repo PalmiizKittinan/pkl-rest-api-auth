@@ -68,7 +68,6 @@ For detailed API documentation and examples, visit the plugin settings page in y
 = Code Example =
 
 Example 1: Get Posts
-    <?php
     $response = wp_remote_get( 'https://yoursite.com/wp-json/wp/v2/posts', array(
         'headers' => array(
             'Authorization' => 'Bearer YOUR_API_KEY'
@@ -78,11 +77,9 @@ Example 1: Get Posts
     if ( ! is_wp_error( $response ) ) {
         $data = json_decode( wp_remote_retrieve_body( $response ) );
     }
-    ?>
 
 Example 2: Create Post
 
-    <?php
     $response = wp_remote_post( 'https://yoursite.com/wp-json/wp/v2/posts', array(
         'headers' => array(
             'Authorization' => 'Bearer YOUR_API_KEY',
@@ -94,7 +91,6 @@ Example 2: Create Post
             'status'  => 'publish'
         ) )
     ) );
-    ?>
 
 == Support ==
 
