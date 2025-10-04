@@ -58,6 +58,9 @@ Yes, the plugin follows WordPress security best practices and stores API keys se
 
 == Changelog ==
 
+= 1.1.0 =
+Change database table schema _id -> UUID()
+
 = 1.0.0 =
 Plugin Launch
 
