@@ -1,6 +1,6 @@
 # 🔐 PKL WPz REST API Authentication
 
-![](https://img.shields.io/badge/Stable_Plugin_Version%20-v3.0.1%20-default)
+![](https://img.shields.io/badge/Stable_Plugin_Version%20-v1.0.0%20-default)
 ![](https://img.shields.io/badge/Manual_Version%20-1.2.2%20-blue)<br>
 
 ---
