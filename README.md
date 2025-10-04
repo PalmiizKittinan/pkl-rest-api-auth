@@ -1,6 +1,6 @@
 # 🔐 PKL WPz REST API Authentication
 
-![](https://img.shields.io/badge/Stable_Plugin_Version%20-v1.0.0%20-default)
+![](https://img.shields.io/badge/Stable_Plugin_Version%20-v1.1.0%20-default)
 ![](https://img.shields.io/badge/Manual_Version%20-1.3.0%20-blue)<br>
 
 🔗 WordPress Plugin Public URL: [https://wordpress.org/plugins/pkl-wpz-rest-api-auth](https://wordpress.org/plugins/pkl-wpz-rest-api-auth/)
