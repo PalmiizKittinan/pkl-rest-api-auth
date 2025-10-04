@@ -56,87 +56,10 @@ Yes, you can revoke your API key from your profile page by clicking the "Revoke 
 
 Yes, the plugin follows WordPress security best practices and stores API keys securely in the database.
 
-== Upgrade Notice ==
-
-= 3.0.0 =
-Initial release of PKL WPZ REST API Auth plugin.
-
-= 2.5.0 =
-New feature for admin page.
-
-= 2.4.0 =
-New feature: Control root REST API endpoint access. Added checkbox to disable/enable wp-json endpoint. Bug fixes included.
-
-= 2.3.0 =
-Security patch update with code improvements for WordPress.org standards. Update recommended.
-
-= 2.2.0 =
-Security patch with Bearer token support added. Update recommended for enhanced security.
-
-= 2.1.0 =
-⚠️ Major security update! OAuth endpoints removed. Please regenerate API keys through user profiles after updating.
-
 == Changelog ==
 
-= 3.0.1 =
-* Rename some function.
-
-= 3.0.0 =
-* Initial release
-* API key authentication support
-* Multiple authentication methods
-* Admin management interface
-
-= 2.5.1 =
-* Bug Fixes
-** Allow only method GET for REST API endpoint (./wp-json/wp/v2/posts)
-** Allow only method GET for REST API endpoint (./wp-json/wp/v2/pages)
-
-= 2.5.0 =
-* Added: Checkbox to disable/enable root REST API endpoint (./wp-json/wp/v2/posts) on admin page : Default is Enable
-* Added: Checkbox to disable/enable root REST API endpoint (./wp-json/wp/v2/pages) on admin page : Default is Enable
-
-= 2.4.0 =
-* Added: Checkbox to disable/enable root REST API endpoint (./wp-json) on admin page
-* Fixed: Various bug fixes for improved stability
-
-= 2.3.3 =
-* Fixed: Bug fixes
-
-= 2.3.2 =
-* Fixed: Bug fixes
-
-= 2.3.1 =
-* Fixed: Bug fixes
-
-= 2.3.0 =
-* Security: Patch security update
-* Fixed: Minor bug fixes
-* Improved: Recoded to meet WordPress.org standards
-
-= 2.2.2 =
-* Security: Patch security update
-
-= 2.2.0 =
-* Security: Patch security update
-* Added: Bearer token authentication method
-
-= 2.1.0 =
-* **Breaking Change**: OAuth endpoints removed for security
-* Added: Secure API key system
-* Added: User profile API key management
-* Improved: Enhanced admin interface
-* Improved: Security and documentation
-* Fixed: DateTime-related bugs
-
-= 2.0.0 =
-* Added: OAuth token system
-* Improved: Enhanced authentication methods
-* Improved: Admin interface redesign
-
-= 1.1.0 =
-* Added: Email authentication
-* Initial public release
+= 1.0.0 =
+🚀 Plugin Launch
 
 == Developer Documentation ==
 
@@ -145,12 +68,13 @@ For detailed API documentation and examples, visit the plugin settings page in y
 = Code Example =
 
 ```php
-// Using Bearer token (Recommended)
+// Using Bearer Token (Recommended)
 $response = wp_remote_get( 'https://yoursite.com/wp-json/wp/v2/posts', [
     'headers' => [
         'Authorization' => 'Bearer YOUR_API_KEY'
     ]
 ]);
+```
 
 == Support ==
 
