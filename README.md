@@ -1,7 +1,7 @@
 # 🔐 PKL WPz REST API Authentication
 
 ![](https://img.shields.io/badge/Stable_Plugin_Version%20-v1.1.0%20-default)
-![](https://img.shields.io/badge/Manual_Version%20-1.3.2%20-blue)<br>
+![](https://img.shields.io/badge/Manual_Version%20-1.4.0%20-blue)<br>
 
 🔗 WordPress Plugin Public URL: [https://wordpress.org/plugins/pkl-wpz-rest-api-auth](https://wordpress.org/plugins/pkl-wpz-rest-api-auth/)
 
@@ -201,6 +201,120 @@ git tag -a "v2.4.0" -m "Updated Minor Version"
 
 # Push Git Tag
 git push origin v2.4.0
+```
+
+---
+
+# WordPress Plugin SVN Manager
+
+## 📋 Requirements
+
+- Windows OS
+- PowerShell 5.1+
+- SVN Client (TortoiseSVN with command line tools)
+- WordPress.org SVN account
+
+## 📁 Folder Structure
+```
+your-plugin/ 
+├── your-plugin-github/ # Git repository 
+│   ├── svn-manager.ps1 ← Main script 
+│   ├── exclude.txt ← (Optional) Files to exclude 
+│   └── [plugin files] 
+└── your-plugin-svn/ # SVN checkout 
+    ├── trunk/ 
+    ├── tags/ 
+    └── assets/
+```
+
+**Important:**
+- Git folder must end with `-github`
+- SVN folder must end with `-svn`
+- Both must be in the same parent folder
+
+## 🚀 Quick Start
+
+### 1. Checkout SVN Repository
+
+```bash
+cd /path/to/your-plugin
+svn co https://plugins.svn.wordpress.org/your-plugin-slug your-plugin-svn
+```
+
+### 2. Place Script
+Put svn-manager.ps1 in your Git folder:
+```
+your-plugin-github/
+├── svn-manager.ps1    ← Place here
+├── your-plugin.php
+└── readme.txt
+```
+
+### 3. Run Manager
+```bash
+cd your-plugin-github
+.\svn-manager.ps1
+```
+
+### 📖 Features
+    1.  Sync files to SVN trunk
+    2.  Sync and commit to SVN
+    3.  Create SVN tag
+    4.  Show SVN tags
+    5.  Delete SVN tag
+    6.  Check SVN status
+    7.  Update from SVN repository
+    8.  Show exclude patterns
+    9.  Setup SVN ignore properties
+    10. Cleanup SVN (revert & reset)
+    11. Exit
+
+### 🎯 Common Workflows
+#### First Time Setup
+
+```text
+# 1. Checkout SVN
+svn co https://plugins.svn.wordpress.org/my-plugin my-plugin-svn
+
+# 2. Run manager
+cd my-plugin-github
+.\svn-manager.ps1
+
+# 3. Select: 9 - Setup SVN ignore properties
+# 4. Select: 1 - Sync files to SVN trunk
+# 5. Select: 6 - Check SVN status
+# 6. Select: 2 - Sync and commit to SVN
+```
+
+#### Update Plugin
+```text
+# 1. Edit plugin files
+# 2. Run manager
+.\svn-manager.ps1
+
+# 3. Select: 2 - Sync and commit to SVN
+# Enter commit message and username
+```
+
+### Release New Version
+```text
+# 1. Update version in plugin file
+# 2. Update readme.txt (Stable tag, Changelog)
+# 3. Run manager
+.\svn-manager.ps1
+
+# 4. Select: 2 - Sync and commit to SVN
+# Message: "Release version 1.2.0"
+
+# 5. Select: 3 - Create SVN tag
+# Version: 1.2.0
+```
+
+### Quick Fix
+```text
+.\svn-manager.ps1
+# Select: 2 - Sync and commit
+# Message: "Fix: Bug description"
 ```
 
 ---

@@ -1,0 +1,62 @@
+# SVN Exclude Patterns
+# Lines starting with # are comments
+# Empty lines are ignored
+
+# Git files
+.git
+.gitignore
+.gitattributes
+.github
+.distignore
+
+# IDE files
+.idea
+.vscode
+*.sublime-project
+*.sublime-workspace
+
+# Node modules
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Composer
+/vendor/
+
+# Build files
+/dist/
+/build/
+*.map
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Scripts
+exclude.txt
+*.ps1
+# SVN directory
+pkl-wpz-rest-api-auth-svn/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*~
+
+# Development files
+.editorconfig
+.eslintrc
+.prettierrc
+phpcs.xml
+phpunit.xml
+
+# Documentation (ถ้าไม่ต้องการอัพโหลด)
+# docs/
+README.md
