@@ -208,7 +208,7 @@ git push origin v2.4.0
 ## 👨‍💻 Author
 
 - GitHub: [@PalmiizKittinan](https://github.com/PalmiizKittinan)
-- Plugin URI: [https://github.com/PalmiizKittinan/pkl-wpz-rest-api-auth](https://github.com/PalmiizKittinan/pkl-wpz-rest-api-auth)
+- Plugin URI: [https://github.com/PalmiizKittinan/pkl-wpz-rest-api-auth](https://wordpress.org/plugins/pkl-wpz-rest-api-auth)
 
 ## 📄 License
 
