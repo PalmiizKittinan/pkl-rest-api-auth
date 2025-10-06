@@ -1,7 +1,7 @@
 # 🔐 PKL WPz REST API Authentication
 
 ![](https://img.shields.io/badge/Stable_Plugin_Version%20-v1.1.0%20-default)
-![](https://img.shields.io/badge/Manual_Version%20-1.3.0%20-blue)<br>
+![](https://img.shields.io/badge/Manual_Version%20-1.3.1%20-blue)<br>
 
 🔗 WordPress Plugin Public URL: [https://wordpress.org/plugins/pkl-wpz-rest-api-auth](https://wordpress.org/plugins/pkl-wpz-rest-api-auth/)
 
@@ -9,7 +9,7 @@
 
 ## 📝 Description
 
-PKL WPz REST API Authentication provides secure authentication for WordPress REST API endpoints using access tokens. Only registered users can generate tokens and access the API, giving you complete control over who can interact with your
+PKL WPz REST API Authentication provides secure authentication for [WordPress REST API endpoints](https://developer.wordpress.org/rest-api/) using access tokens. Only registered users can generate tokens and access the API, giving you complete control over who can interact with your
 WordPress site programmatically.
 
 ## ✨ Features
