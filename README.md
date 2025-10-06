@@ -1,7 +1,7 @@
 # 🔐 PKL WPz REST API Authentication
 
 ![](https://img.shields.io/badge/Stable_Plugin_Version%20-v1.1.0%20-default)
-![](https://img.shields.io/badge/Manual_Version%20-1.4.0%20-blue)<br>
+![](https://img.shields.io/badge/Manual_Version%20-1.4.1%20-blue)<br>
 
 🔗 WordPress Plugin Public URL: [https://wordpress.org/plugins/pkl-wpz-rest-api-auth](https://wordpress.org/plugins/pkl-wpz-rest-api-auth/)
 
@@ -257,20 +257,20 @@ cd your-plugin-github
 ```
 
 ### 📖 Features
-    1.  Sync files to SVN trunk
-    2.  Sync and commit to SVN
-    3.  Create SVN tag
-    4.  Show SVN tags
-    5.  Delete SVN tag
-    6.  Check SVN status
-    7.  Update from SVN repository
-    8.  Show exclude patterns
-    9.  Setup SVN ignore properties
+    1. Sync files to SVN trunk
+    2. Sync and commit to SVN
+    3. Create SVN tag
+    4. Show SVN tags
+    5. Delete SVN tag
+    6. Check SVN status
+    7. Update from SVN repository
+    8. Show exclude patterns
+    9. Setup SVN ignore properties
     10. Cleanup SVN (revert & reset)
     11. Exit
 
-### 🎯 Common Workflows
-#### First Time Setup
+## 🎯 Common Workflows
+### First Time Setup
 
 ```text
 # 1. Checkout SVN
@@ -286,7 +286,7 @@ cd my-plugin-github
 # 6. Select: 2 - Sync and commit to SVN
 ```
 
-#### Update Plugin
+### Update Plugin
 ```text
 # 1. Edit plugin files
 # 2. Run manager
