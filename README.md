@@ -205,7 +205,7 @@ git push origin v2.4.0
 
 ---
 
-# WordPress Plugin SVN Manager
+# 📝 WordPress Plugin SVN Manager
 
 ## 📋 Requirements
 
@@ -256,7 +256,7 @@ cd your-plugin-github
 .\svn-manager.ps1
 ```
 
-### 📖 Features
+## 📖 Features
     1. Sync files to SVN trunk
     2. Sync and commit to SVN
     3. Create SVN tag
